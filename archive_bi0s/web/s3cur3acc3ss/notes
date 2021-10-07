@@ -1,0 +1,4 @@
+Access only for users coming from google
+  <a href="https://google.com">google</a>
+
+change the site header Referer to https://google.com

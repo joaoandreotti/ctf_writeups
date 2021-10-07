@@ -1,0 +1,22 @@
+disas main:
+  lea rax, [rbp-0x20] ; 32 == 8(?) + 24(buffer size)
+  mv rdi, rax
+  call gets
+
+gets is prone to bof as it doesnt check for boundary
+anything bigger then 40 is going to overwrite rip
+0-7(?)
+8-31(buff)
+32-39(rbp)
+40-47(rip)
+
+checksec bof:
+  RELRO:    Partial RELRO
+  Stack:    No canary found
+  NX:       NX enabled
+  PIE:      No PIE (0x400000)
+
+there is a function win() that calls /bin/sh and no PIE
+change the return address and boom
+
+using python + pwn to make things easy and done

@@ -1,0 +1,3 @@
+when buying the knockoff flags it multiplies the value of 900*(INPUT) and then (account_balance = account_balance - total_cost).
+if 900*(INPUT) >= INT_MAX, but (INPUT) <= INT_MAX) it will pass the if(number_flags > 0) and (total_cost = 900*number_flags;) will be negative. When it reaches account_balance = account_balance - total_cost; it will add up to balance.
+Making money made easy

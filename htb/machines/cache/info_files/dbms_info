@@ -1,0 +1,13 @@
+<b>Configuration:</b><br/>
+driver = <b>mysqli_mod</b>,<br/>
+host = <b>localhost</b>,<br/>
+user = <b>openemr</b>,<br/>
+database = <b>openemr</b>,<br/>
+table prefix = <b>gacl_</b>Testing database connection...<br/>
+<font color="green"><b>Success!</b></font> Connected to &quot;<b>mysqli_mod</b>&quot; database on &quot;<b>localhost</b>&quot;.<br/>
+Testing database type...<br/>
+<font color="green"><b>Success!</b></font> Compatible database type "<b>mysqli_mod</b>" detected!<br/>
+Making sure database "<b>openemr</b>" exists...<br/>
+<font color="green"><b>Success!</b></font> Good, database "<b>openemr</b>" already exists!<br/>
+<font color="green"><b>Success!</b></font> 
+First Step of Access Control Installation Successful!!!<br><br/>

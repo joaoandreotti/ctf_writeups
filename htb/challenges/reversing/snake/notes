@@ -1,0 +1,10 @@
+to find the username just print slither var
+to find the password just check how the encryption works
+first part is a bunch of keys xoring with 0x5
+  the first part keys is: password!!
+second part is a bunch of keys adding with 0xA
+  the second part keys is: this is a troll
+
+trying the whole password didnt work on htb
+trying the encrypted first part because it is encrypted by 'password!!'
+done!

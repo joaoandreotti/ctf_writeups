@@ -1,0 +1,2 @@
+the current dir is /missions/extbasic/
+solve is ../../index

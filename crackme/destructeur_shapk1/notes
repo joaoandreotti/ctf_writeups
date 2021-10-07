@@ -1,0 +1,21 @@
+using jadx decompiler
+on MainActivity:
+  public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
+        setContentView((int) R.layout.activity_main);
+        check();
+  }
+
+function check() is used to set a button onClickListener that get a text from an EditText, generate a key using encrypt, base64 the result and compare it to a secret
+
+base64 decrypt the secret and we got the encrypted secret
+the function encrypt() works like this:
+  for (int i = 0; i < msg.length; i++) {
+    result [i] = (byte) (msg[i] ^ key[i % length]);
+if msg == secret, the XOR will do the reverse operation(look for XOR properties (https://accu.org/journals/overload/20/109/lewin_1915/)) and the key will be available
+
+secrete and key values is found on jadx (resources.arsc/res/values/strings.xml)
+  <string name="secret">NQALCgEDDDEzUjpTBwocBgcDPTIIGwIK</string>
+  <string name="key">beginning</string>
+using python to create a script that base64 decode and for the encrypt method with secret [i] ^ key [i]
+done

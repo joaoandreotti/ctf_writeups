@@ -1,0 +1,42 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Arrexel's Development Site
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 80/tcp on 10.10.10.68 
+
+---GOBUSTER---
+*gobuster dir -u http://10.10.10.68/ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -r -x php,sh,txt -q -t 50
+  /images (Status: 200)
+  /uploads (Status: 200)
+  /php (Status: 200)
+  /css (Status: 200)
+  /dev (Status: 200)
+  /js (Status: 200)
+  /config.php (Status: 200)
+  /fonts (Status: 200)
+  /server-status (Status: 403)
+
+
+---ATTEMPTS---
+found the phpbash.php inside /dev/
+
+---PRIVESC---
+*sudo -l
+ (scriptmanager : scriptmanager) NOPASSWD: ALL
+*sudo --user=scriptmanager /bin/bash
+*cat /home/arrexel/user.txt
+
+*sudo -v
+Sorry, user scriptmanager may not run sudo on bashed.
+*./linpeash.sh
+revealed a /script folder
+found test.py and checked that it changed it timestamp every minute
+probably it executes every minute. and i writes to a test.txt owned by root
+using python to create a reverse shell
+kudos!
+
+*cat /root/root.txt

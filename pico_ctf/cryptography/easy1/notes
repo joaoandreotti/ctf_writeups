@@ -1,0 +1,1 @@
+just the basic of one time pad (dec = (cipher[x] - key [x]) % 26)

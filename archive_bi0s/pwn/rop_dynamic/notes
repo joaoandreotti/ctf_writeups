@@ -1,0 +1,26 @@
+64bit elf
+checksec:
+  RELRO:    Partial RELRO
+  Stack:    No canary found
+  NX:       NX enabled
+  PIE:      No PIE (0x400000)
+
+dynamic linked
+this is where ret2libc come into play
+first of all it is needed to leak libc
+
+leaking some values of __libc_start_main, printf and etc
+then going on libc.blukat.me and type the values
+
+then download the libc, and using pwntools open with pwn.ELF
+ASLR is probably on, to bypass this
+leak the value of __libc_start_main again, but this time return to <main+0>
+then, get the addr of libc and set to its new offset
+
+now it's just the basic ret2libc
+
+leaked libc using __libc_start_main and gets from .got:
+  libc6_2.28-10_amd64
+
+downloading and creating a specific exploit to this libc
+done!

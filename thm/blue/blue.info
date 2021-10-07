@@ -1,0 +1,77 @@
+<><><> NMAP <><><>
+PORT      STATE SERVICE            VERSION
+135/tcp   open  msrpc              Microsoft Windows RPC
+139/tcp   open  netbios-ssn        Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds       Windows 7 Professional 7601 Service Pack 1 microsoft-ds (workgroup: WORKGROUP)
+3389/tcp  open  ssl/ms-wbt-server?
+| ssl-cert: Subject: commonName=Jon-PC
+| Not valid before: 2021-05-25T11:54:22
+|_Not valid after:  2021-11-24T11:54:22
+|_ssl-date: 2021-05-26T12:00:17+00:00; 0s from scanner time.
+49152/tcp open  msrpc              Microsoft Windows RPC
+49153/tcp open  msrpc              Microsoft Windows RPC
+49157/tcp open  msrpc              Microsoft Windows RPC
+Service Info: Host: JON-PC; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 1h15m00s, deviation: 2h30m00s, median: 0s
+|_nbstat: NetBIOS name: JON-PC, NetBIOS user: <unknown>, NetBIOS MAC: 02:67:4f:33:36:f1 (unknown)
+| smb-os-discovery: 
+|   OS: Windows 7 Professional 7601 Service Pack 1 (Windows 7 Professional 6.1)
+|   OS CPE: cpe:/o:microsoft:windows_7::sp1:professional
+|   Computer name: Jon-PC
+|   NetBIOS computer name: JON-PC\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2021-05-26T07:00:10-05:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-05-26T12:00:10
+|_  start_date: 2021-05-26T11:54:01
+
+<><><> ATTEMPTS <><><>
+searching of a nmap script that can scan more deeply the open services
+found a script that works on ms-wbt-server and it show if has a denial of service vuln, RCE vuln:
+  PORT     STATE SERVICE
+  3389/tcp open  ms-wbt-server
+  | rdp-vuln-ms12-020: 
+  |   VULNERABLE:
+  |   MS12-020 Remote Desktop Protocol Denial Of Service Vulnerability
+  |     State: VULNERABLE
+  |     IDs:  CVE:CVE-2012-0152
+  |     Risk factor: Medium  CVSSv2: 4.3 (MEDIUM) (AV:N/AC:M/Au:N/C:N/I:N/A:P)
+  |           Remote Desktop Protocol vulnerability that could allow remote attackers to cause a denial of service.
+  |           
+  |     Disclosure date: 2012-03-13
+  |     References:
+  |       http://technet.microsoft.com/en-us/security/bulletin/ms12-020
+  |       https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2012-0152
+  |   
+  |   MS12-020 Remote Desktop Protocol Remote Code Execution Vulnerability
+  |     State: VULNERABLE
+  |     IDs:  CVE:CVE-2012-0002
+  |     Risk factor: High  CVSSv2: 9.3 (HIGH) (AV:N/AC:M/Au:N/C:C/I:C/A:C)
+  |           Remote Desktop Protocol vulnerability that could allow remote attackers to execute arbitrary code on the targeted system.
+  |           
+  |     Disclosure date: 2012-03-13
+  |     References:
+  |       http://technet.microsoft.com/en-us/security/bulletin/ms12-020
+  |_      https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2012-0002
+
+searching for and exploit to rce
+apparently there is more, that answer to the question in thm isn`t ms12-020
+it was ms17-010, i went by reading all ms**-*** scripts in nmap documentation and searched for the fit with this server
+it is a lot harder to not RCE this server than to RCE...
+the thm questions imply that it is needed to use metasploit-framework...
+it is what it is
+what... already root?
+whoami
+nt authority\system
+using hashcat to crack Jon passwd
+using `dir "\flag*" /s` to find all flags

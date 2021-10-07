@@ -1,0 +1,91 @@
+<><><> NMAP <><><>
+PORT     STATE SERVICE REASON         VERSION
+22/tcp   open  ssh     syn-ack ttl 63 OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 6d:fc:68:e2:da:5e:80:df:bc:d0:45:f5:29:db:04:ee (RSA)
+| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCpzM/GEYunOwIMB+FyQCnOaYRK1DYv8e0+VI3Zy7LnY157q+3SITcgm98JGS/gXgdHQ4JnkCcXjUb9LaNRxRWO+l43E9v2b2U9roG8QetbBUl5CjJ0KHXeIwNgOcsqfwju8i8GA8sqQCELpJ3zKtKtxeoBo+/o3OnKGzT/Ou8lqPK7ESeh6OWCo15Rx9iOBS40i6zk77QTc4h2jGLOgyTfOuSGTWhUxkhqBLqSaHz80G7HsPSs1BA9zAV8BOx9WmtpMsgDcNG14JAQQd904RCzgw0OaQ0J6szs78Us8Piec0rF/T4b1H3sbUedOdA0QKgGbNojObVrz5VwOw6rqxbs1gZLePXB5ZNjm0cp+Sen8TkRkdUf7Sgw92B//RhSoIakp1u5eOPs/uJ6hyCholUnerl3WK8NPB9f9ICPYq8PbvVMu6zcytV/cCjwxFloWB989iyuqG/lYcdMhGJlAacOFy5TRcTB8c5Qlmtl44J/4dyuCJAhj5SY6TRdcSxhmz0=
+|   256 7a:c9:83:7e:13:cb:c3:f9:59:1e:53:21:ab:19:76:ab (ECDSA)
+| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBM79V2Ts2us0NxZA7nnN9jor98XRj0hw7QCb+A9U8aEhoYBcrtUqegExaj/yrxjbZ/l0DWw2EkqH4uly451JuMs=
+|   256 17:6b:c3:a8:fc:5d:36:08:a1:40:89:d2:f4:0a:c6:46 (ED25519)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO31s/C33kbuzZl9ohJWVEmLsW9aqObU6ZjlpbOQJt0C
+8080/tcp open  http    syn-ack ttl 63 Apache Tomcat 9.0.38
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-title: Parse YAML
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+<><><> GOBUSTER <><><>
+/manager              (Status: 401) [Size: 2499]
+/http%3A%2F%2Fwww.js  (Status: 400) [Size: 804]
+/http%3A%2F%2Fwww     (Status: 400) [Size: 804]
+/http%3A%2F%2Fwww.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fwww.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fyoutube (Status: 400) [Size: 804]
+/http%3A%2F%2Fyoutube.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fyoutube.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fyoutube.js (Status: 400) [Size: 804]
+/http%3A%2F%2Fblogs   (Status: 400) [Size: 804]
+/http%3A%2F%2Fblogs.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fblogs.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fblogs.js (Status: 400) [Size: 804]
+/http%3A%2F%2Fblog.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fblog.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fblog.js (Status: 400) [Size: 804]
+/http%3A%2F%2Fblog    (Status: 400) [Size: 804]
+/**http%3A%2F%2Fwww   (Status: 400) [Size: 804]
+/**http%3A%2F%2Fwww.php (Status: 400) [Size: 804]
+/**http%3A%2F%2Fwww.txt (Status: 400) [Size: 804]
+/**http%3A%2F%2Fwww.js (Status: 400) [Size: 804]
+/yaml                 (Status: 200) [Size: 8042]
+/External%5CX-News.js (Status: 400) [Size: 795]
+/External%5CX-News    (Status: 400) [Size: 795]
+/External%5CX-News.php (Status: 400) [Size: 795]
+/External%5CX-News.txt (Status: 400) [Size: 795]
+/http%3A%2F%2Fcommunity (Status: 400) [Size: 804]
+/http%3A%2F%2Fcommunity.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fcommunity.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fcommunity.js (Status: 400) [Size: 804]
+/http%3A%2F%2Fradar.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fradar   (Status: 400) [Size: 804]
+/http%3A%2F%2Fradar.js (Status: 400) [Size: 804]
+/http%3A%2F%2Fradar.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fjeremiahgrossman.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fjeremiahgrossman.js (Status: 400) [Size: 804]
+/http%3A%2F%2Fjeremiahgrossman (Status: 400) [Size: 804]
+/http%3A%2F%2Fjeremiahgrossman.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fweblog  (Status: 400) [Size: 804]
+/http%3A%2F%2Fweblog.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fweblog.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fweblog.js (Status: 400) [Size: 804]
+/http%3A%2F%2Fswik    (Status: 400) [Size: 804]
+/http%3A%2F%2Fswik.php (Status: 400) [Size: 804]
+/http%3A%2F%2Fswik.txt (Status: 400) [Size: 804]
+/http%3A%2F%2Fswik.js (Status: 400) [Size: 804]
+
+<><><> ATTEMPTS <><><>
+the website yaml parser is disabled
+feels like the only way is to exploit is through yaml "data" payload
+apache tomcat is written in java, searching for exploit in yaml parsers
+kudos!
+
+<><><> PRIVESC <><><>
+found tomcat user config file:
+	<user username="admin" password="whythereisalimit" roles="manager-gui,admin-gui"/>
+got user!
+
+sudo -l:
+	(ALL) NOPASSWD: /usr/bin/go run /opt/wasm-functions/index.go
+
+the index.go reads a "main.wasm" file, this file doesnt have it's full path written
+than, it creates a new instance of this file, execute some "info" function and then check if the result != "1"
+if isn`t != "1", it execute a /bin/sh and we should get root
+trying to recreate this web assembly with a info function
+c to wasm:
+	int info()
+	{
+		return 1;
+	}
+
+got the "Ready to deploy"
+now, the script run the file: deploy.sh using /bin/sh
+running a rshell, kudos!

@@ -1,0 +1,2 @@
+answer is a list of numbers in myBytes
+just print the ascii value for each list number, except if it is already a string

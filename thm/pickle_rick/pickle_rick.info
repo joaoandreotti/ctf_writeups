@@ -1,0 +1,55 @@
+<><><> NMAP <><><>
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.6 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 fb:2f:52:e0:b0:9d:4e:13:49:6b:69:76:3e:57:a4:c5 (RSA)
+|   256 3a:d7:0c:14:a3:11:5e:c9:1b:c8:45:7c:0e:14:59:32 (ECDSA)
+|_  256 68:82:d5:31:9c:51:c0:1a:17:07:94:b8:42:c0:c4:5d (ED25519)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Rick is sup4r cool
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+<><><> GOBUSTER <><><>
+/.htpasswd.txt        (Status: 403) [Size: 299]
+/.htaccess.php        (Status: 403) [Size: 299]
+/.htaccess            (Status: 403) [Size: 295]
+/.htpasswd.php        (Status: 403) [Size: 299]
+/.htaccess.txt        (Status: 403) [Size: 299]
+/.htpasswd            (Status: 403) [Size: 295]
+/assets               (Status: 200) [Size: 2190]
+/denied.php           (Status: 200) [Size: 882] 
+/login.php            (Status: 200) [Size: 882] 
+/portal.php           (Status: 200) [Size: 882] 
+/robots.txt           (Status: 200) [Size: 17]  
+/robots.txt           (Status: 200) [Size: 17]  
+/server-status        (Status: 403) [Size: 299] 
+
+<><><> ATTEMPTS <><><>
+ <!--
+
+    Note to self, remember username!
+
+    Username: R1ckRul3s
+
+  -->
+
+bruteforcing ssh with hydra, ssh does not support password auth
+found login page
+bruteforcing with hydra
+found wubalub... in robots.txt
+trying it as a password, done!
+((R1ckRul3s:Wubbalubbadubdub))
+found a form that execute shell commands, using it to get a rshell
+found a file Sup3rS3c...Ingredient.txt:
+  (mr. meeseek hair)
+found in /home/rick/second ingrediente:
+  (1 jerry tear)
+found a base64 in portal.php which required multiple decodes and the message is rabbit role :)
+i already search the entire accessible file system by www-data
+probably the 3rd ingredient is on /root
+trying to 'su root' with the same pass
+nope
+sudo -l ((ALL) NOPASSWD: ALL)
+oh yeah, the 3rd one as in /root
+kudos!

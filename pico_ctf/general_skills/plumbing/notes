@@ -1,0 +1,3 @@
+nc jupiter.challenges.picoctf.org 29482 > james; cat james | grep picoCTF
+or 
+nc jupiter.challenges.picoctf.org 29482 | grep picoCTF

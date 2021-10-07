@@ -1,0 +1,36 @@
+reads a integer and compare it to a rand (), if true then go to function win ()
+function win allows buffer overflow
+NX and Canary are enabled but PIE is not
+Although Canary is found by checksec, there is no canary in function win, so buff overflow is easy
+It cannot be a ret2shellcode, it can be ret2libc or rop
+the libc is unknown, so rop is a lot easier
+it is staticaly linked
+
+set rax to 0x3b (execve), set rdi to "/bin/sh", set rdx and rsi to 0, syscall
+or
+set rax to 0xb, set rbx to "/bin/sh", set rcx and rdx to 0, int 0x80
+
+no /bin/sh string
+here is a little bit tricky, to write in .bss section we need to find a series of rop gadgets
+writing the /bin/sh string in .bss:
+  x = .bss addr
+  y = /bin/sh
+  pop x; pop y; ret
+  mov [x], y; ret
+.bss addr can be found in the binary
+'/bin/sh' is user setted in the exploit
+first, set rdi to .bss addr:
+  pop_rdi
+  bss
+second, set rsi with the string:
+  pop_rsi
+  '/bin/sh'
+finally, (mov [x], y) ; ret
+  mov_rdi_rsi
+rdi now contains a pointer the the string '/bin/sh'
+the rest of the rop chain is default one, 
+
+using python pwn to create the payload
+
+the rand () function is not totally random, the seed isnt setted
+bruting until it find the number and then send the exploit

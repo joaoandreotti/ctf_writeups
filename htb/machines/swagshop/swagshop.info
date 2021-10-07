@@ -1,0 +1,57 @@
+---PORT ENUM---
+sudo masscan -i tun0 --rate=1000 -p 1-65535 10.10.10.140 > open_ports && nmap $(cat open_ports | sed -e 's/[^0-9\/]//g' | sed -e 's/\/.*//g' | sed -e ':a' -e 'N' -e '$!ab' -e 's/\n/,/g') -sV -sC -Pn 10.10.10.140
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 b6:55:2b:d2:4e:8f:a3:81:72:61:37:9a:12:f6:24:ec (RSA)
+|   256 2e:30:00:7a:92:f0:89:30:59:c1:77:56:ad:51:c0:ba (ECDSA)
+|_  256 4c:50:d5:f2:70:c5:fd:c4:b2:f0:bc:42:20:32:64:34 (ED25519)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Home page
+
+---GOBUSTER---
+/ (medium.txt):
+  /index.php (Status: 200)
+  /media (Status: 200)
+  /includes (Status: 200)
+  /install.php (Status: 200)
+  /lib (Status: 200)
+  /app (Status: 200)
+  /api.php (Status: 200)
+  /shell (Status: 200)
+  /skin (Status: 200)
+  /cron.php (Status: 200)
+  /var (Status: 200)
+  /errors (Status: 200)
+  /mage (Status: 200)
+  /server-status (Status: 403)
+
+---ATTEMPTS---
+found magento version to be < 2.0.0
+account creation enabled
+exploring /var found:
+  "username";s:5:"forme";s:8:"password";s:35:"0a8335493c9fccd648ba53c601e3d67c"
+  hashkiller: 0a8335493c9fccd648ba53c601e3d67c:rpforme
+
+using magescan found a file /index.php/rss/order/NEW/new which is a xml with <link>http://10.10.10.140/index.php/admin/sales_order/</link> that is a admin login page
+unable to login with known credentials
+
+in /app/etc/local.xml:
+  <username>root</username>
+  <password>fMVWh7bDHpgZkyfqQXreTjU9</password>
+
+using the exploit-db.com/exploits/37977 and modify the path adding a index.php to the exploit. It makes a SQLi to add a forme/forme user/pass admin credentials.
+done!
+now using another exploit that is aRCE. the problem with this script is that one of the requests is getting no data found. This problem occurs because the script looks into the tab_orders/period/7d and it seems that no orders was made in this period. changing to 1y
+  https://websec.wordpress.com/2014/12/08/magento-1-9-0-1-poi/
+kudos!
+
+---PRIVESC---
+sudo -l:
+    (root) NOPASSWD: /usr/bin/vi /var/www/html/*
+executing vi with sudo and then executing a shell inside
+kudos!
+*cat /root/root.txt
+*cat /home/haris/user.txt

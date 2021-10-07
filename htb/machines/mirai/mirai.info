@@ -1,0 +1,84 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 6.7p1 Debian 5+deb8u3 (protocol 2.0)
+| ssh-hostkey: 
+|   1024 aa:ef:5c:e0:8e:86:97:82:47:ff:4a:e5:40:18:90:c5 (DSA)
+|   2048 e8:c1:9d:c5:43:ab:fe:61:23:3b:d7:e4:af:9b:74:18 (RSA)
+|   256 b6:a0:78:38:d0:c8:10:94:8b:44:b2:ea:a0:17:42:2b (ECDSA)
+|_  256 4d:68:40:f7:20:c4:e5:52:80:7a:44:38:b8:a2:a7:52 (ED25519)
+53/tcp open  domain  dnsmasq 2.76
+| dns-nsid: 
+|_  bind.version: dnsmasq-2.76
+80/tcp open  http    lighttpd 1.4.35
+|_http-server-header: lighttpd/1.4.35
+|_http-title: Site doesn't have a title (text/html; charset=UTF-8).
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 32400/tcp on 10.10.10.48                                  
+Discovered open port 53/tcp on 10.10.10.48                                     
+Discovered open port 22/tcp on 10.10.10.48                                     
+Discovered open port 32469/tcp on 10.10.10.48                                  
+Discovered open port 80/tcp on 10.10.10.48                                     
+Discovered open port 1505/tcp on 10.10.10.48   
+
+---DNS---
+*nslookup
+  > SERVER 10.10.10.48
+  Default server: 10.10.10.48
+  Address: 10.10.10.48#53
+  > 127.0.0.1
+  1.0.0.127.in-addr.arpa  name = localhost.
+  > 10.10.10.48
+  ** server can't find 48.10.10.10.in-addr.arpa: NXDOMAIN
+
+*dnsrecon -r 127.0.0.0/24 -n 10.10.10.48
+  [+] {'type': 'PTR', 'name': 'localhost', 'address': '127.0.0.1'}
+*dnsrecon -r 10.10.10.0/24 -n 10.10.10.48
+  [+] 0 Records Found
+
+*dig axfr @10.10.10.48
+  ; <<>> DiG 9.16.2-Debian <<>> axfr @10.10.10.48
+  ; (1 server found)
+  ;; global options: +cmd
+  ;; connection timed out; no servers could be reached
+
+---GOBUSTER---
+dir enum could not be achieved
+Error: the server returns a status code that matches the provided options for non existing urls.
+
+---ATTEMPTS---
+adding 10.10.10.48	mirai.htb to hosts and found a server
+Generated Fri 1:14 PM, Aug 28 by Pi-hole v3.1.4
+search a little bit and found that pi-hole has a /admin
+trying that and got a 200 OK
+http://mirai.htb/admin/index.php?login (no user needed)
+trying to bruteforce a login (unsuccessful)
+found inside page script /admin/scripts/pi-hole/php/add.php (whitelist pages)
+
+found about MIRAI BOTNET and that it explores the default pi/raspberry
+trying to login into ssh
+done!
+cat /home/pi/Desktop/user.txt
+
+---privesc---
+*sudo -l
+  User pi may run the following commands on localhost:
+      (ALL : ALL) ALL
+      (ALL) NOPASSWD: ALL
+*cat /root/root.txt
+  I lost my original root.txt! I think I may have a backup on my USB stick...
+mouting with fdisk
+*cat /media/usbstick/damnit.txt
+  Damnit! Sorry man I accidentally deleted your files off the USB stick.
+  Do you know if there is any way to get them back?
+  
+  -James
+using testdisk to recover
+superblock 0, blocksize=1024 []                                                 
+superblock 8193, blocksize=1024 [] 
+(unsuccessful)
+as the testdisk found the file but it has a 0 size running *strings command or some hex editor will reveal the data, and the flag format is a known one
+kudos!
+*strings /dev/sdb

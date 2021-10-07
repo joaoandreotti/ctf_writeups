@@ -1,0 +1,8 @@
+PORT     STATE SERVICE VERSION                                                  
+80/tcp   open  http    Microsoft IIS httpd 10.0                                 
+| http-methods:                                                                 
+|_  Potentially risky methods: TRACE                                            
+|_http-server-header: Microsoft-IIS/10.0                                        
+|_http-title: IIS Windows Server                                                
+3306/tcp open  mysql   MySQL (unauthorized)                                     
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows                        

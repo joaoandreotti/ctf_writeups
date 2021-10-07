@@ -1,0 +1,60 @@
+<><><> NMAP <><><>
+PORT      STATE    SERVICE        REASON         VERSION
+22/tcp    open     ssh            syn-ack ttl 63 OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 86:df:10:fd:27:a3:fb:d8:36:a7:ed:90:95:33:f5:bf (RSA)
+| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCZwjrB05nGUvacI81YxNqy+6WpPHhIju6c73aoiru9nW/aVhTmOEsSOGoChEXeQeDN67ZN5QW4LFf0tXeQeJqvgO82HtFkUOiN8tt1RpI98SV+hx8scCzpmtAyu1OJSUM3/cL2tEPTcPHAgHTmroWiXxIMPhTFLIoDVBIqmBrORUIwgjIzFUbEDQJXKPkFciofbowVOkHnT+lv5XokU6571wrX/LRJvTNBEAvbbz0HAfvUkne8ycQsW08qk/BugiLnJHLg24YryGdHl5RqqW/42fsUADngFLncy2+/XCo8Pe/erO+7Zw6r4n1qVb0W0BZ+lRflcRss3diM/21R6O0z
+|   256 e7:81:d6:6c:df:ce:b7:30:03:91:5c:b5:13:42:06:44 (ECDSA)
+| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLeuBF/ZBUM0ZBYW4+vgQMhIPWVs2fzv9lmQHoflWFNMP/sFWZDeVneJE0CRSLnYi2y/wwc079bIsQRibay3Fpg=
+|   256 c6:06:34:c7:fc:00:c4:62:06:c2:36:0e:ee:5e:bf:6b (ED25519)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDg0mzA1xTe9hivlJN4s+7eXaiyIYefpyykHIir3btEA
+80/tcp    open     http           syn-ack ttl 63 nginx 1.14.0 (Ubuntu)
+|_http-favicon: Unknown favicon MD5: B2F904D3046B07D05F90FB6131602ED2
+| http-methods: 
+|_  Supported Methods: OPTIONS GET HEAD
+|_http-server-header: nginx/1.14.0 (Ubuntu)
+|_http-title: The Notebook - Your Note Keeper
+10010/tcp filtered rxapi          no-response
+
+
+<><><> GOBUSTER <><><>
+/login                (Status: 200) [Size: 1250]
+/register             (Status: 200) [Size: 1422]
+/admin                (Status: 403) [Size: 9]   
+/logout               (Status: 200) [Size: 1849]
+
+<><><> ATTEMPTS <><><>
+possible to reach another notes on /UID/notes/0
+but it returns unauthorized
+auth cookie:
+	{"typ":"JWT","alg":"RS256","kid":"http://localhost:7070/privKey.key"}{"username":"james","email":"james@james.com","admin_cap":false}
+trying to change this to admin_cap:true
+didn't work
+if correct UID the notes can be read without any authentication
+trying to bruteforce admin user
+unsuccessful
+trying to change kid to my ip
+nice!! creating the key file with something I already know and setting admin to true
+	using pyjwt to generate new JWT
+	*openssl genrsa -out private 3072
+	*python3 jwt_encoder.py
+using new jwt cookie
+creating http server to let the machine retrieve the private key
+kudos!
+it is possible to upload files as admin, php rshell should do the work
+kudos!
+
+<><><> PRIVESC <><><>
+www-data
+nothing obvious on linpeas
+it is possible to write on /dev/shm/rootfs
+found home.tar.gz in backups
+brute ssh private key
+oh, no password private key :)
+
+noah
+    (ALL) NOPASSWD: /usr/bin/docker exec -it webapp-dev01*
+
+found exploit to this docker version (https://github.com/rancher/runc-cve)
+trying to make it work
+kudos!!

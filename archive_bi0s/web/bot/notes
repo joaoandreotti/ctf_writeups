@@ -1,0 +1,10 @@
+desc:
+  Tarun is making a website So, he is hiding some files. You can find it but search engines (bot) can not :)...!!! 
+
+on robots.txt found: disallow: /fl4g.html
+
+useless message but useful comments:
+  By Solving this you will get directory of the flag: 
+    [chr(ord('fmcd[luX`lxn'[i])^i) for i in xrange(12)]
+
+found the flag on the directory

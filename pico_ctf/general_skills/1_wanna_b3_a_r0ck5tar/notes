@@ -1,0 +1,13 @@
+using rockstar-py found that it has two comparissions to show the pass: 
+  the_music = input()
+    if the_music == a_guitar:
+    the_rhythm = input()
+      if the_rhythm - Music == False:
+      ...
+
+a_guitar = 10
+Music = 170
+
+so input:
+  10
+  170

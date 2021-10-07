@@ -1,0 +1,8 @@
+/home (Status: 302)
+/register (Status: 200)
+/login (Status: 200)
+/archive (Status: 200)
+/account (Status: 302)
+/logout (Status: 302)
+/reset_password (Status: 200)
+/server-status (Status: 403)

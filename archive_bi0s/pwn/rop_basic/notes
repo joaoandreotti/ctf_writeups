@@ -1,0 +1,22 @@
+64bit elf
+checksec:
+  RELRO:    Partial RELRO
+  Stack:    Canary found
+  NX:       NX enabled
+  PIE:      No PIE (0x400000)
+
+staticaly linked
+although canary is found, the function main doesnt have it
+just a basic rop without bigger problem
+a lil trick here is to write '/bin/sh' into .bss, this way I can have the pointer to '/bin/sh'
+
+setting bss value to rdi
+  pop_rdi
+  .bss addr
+setting '/bin//sh/' to rsi
+  pop_rsi
+  '/bin//sh'
+then
+  mov qwort ptr [rdi], rsi, ret
+
+and the basic rop to call system

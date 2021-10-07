@@ -1,0 +1,61 @@
+ENUMERATION (nmap/masscan/gobuster/dirbuster)
+
+DNS:
+  https://cr.yp.to/djbdns/intro-dns.html
+  TCP:
+    https://cr.yp.to/djbdns/tcp.html#why
+  NSLOOKUP:
+    *nslookup
+      > SERVER "IP"
+      > 127.0.0.1
+      > "IP"
+  DNSRECON:
+    *dnsrecon -r 127.0.0.0/24 -n "IP"
+    *dnsrecon -r "NETWORK_IP/24" -n "IP"
+  DIG:
+    *dig axfr @"IP"
+    *dig axfr "HOST" @"IP"
+    (AXFR (DNS zone transfer)):
+      https://cr.yp.to/djbdns/axfr-notes.html
+
+REMOTE:
+  FTP:
+    https://en.wikipedia.org/wiki/File_Transfer_Protocol
+  SSH:
+    https://en.wikipedia.org/wiki/Secure_Shell
+  HEARTBLEED:
+    https://en.wikipedia.org/wiki/Heartbleed
+
+WEB:
+  SEARCH A KNOW EXPLOIT (exploit-db [try harding!])
+  FILE INCLUSION VULN:
+    https://en.wikipedia.org/wiki/File_inclusion_vulnerability#Example
+  DIRECTORY TRAVERSAL ATTACK:
+    https://en.wikipedia.org/wiki/Directory_traversal_attack#Example
+  VIRTUALHOST ROUTING:
+    https://en.wikipedia.org/wiki/Virtual_hosting
+  CSRF:
+    https://en.wikipedia.org/wiki/Cross-site_request_forgery#Example
+  BRUTEFORCE CREDENTIALS:
+    *hydra -L <USER> -P <Password> <IP Address> http-post-form “<Login Page>:<Request Body>:<Error Message>”
+  CERTIFICATES:
+    https://en.wikipedia.org/wiki/Public_key_certificate
+
+IoT DEVICES:
+  (MIRAI MALWARE)
+  NORMALY THE CONFIG IS THE DEFAULT ONE
+
+LOCAL:
+  pspyXX:
+    https://github.com/DominicBreuker/pspy
+  WINPEAS/LINPEAS:
+    https://book.hacktricks.xyz/
+  BUFFEROVERFLOW:
+    https://en.wikipedia.org/wiki/Buffer_overflow#Example
+    ROP ATTACK:
+      https://en.wikipedia.org/wiki/Return-oriented_programming
+  LINUX:
+    SHELLSHOCK:
+      https://en.wikipedia.org/wiki/Shellshock_(software_bug)
+    DIRTY_COW:
+      https://en.wikipedia.org/wiki/Dirty_COW

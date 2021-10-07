@@ -1,0 +1,1 @@
+in the request header there is a cookie called level10_authorized, is the request is ... Cookie: level10_authorized=yes ..., the site will think that the user is authorized

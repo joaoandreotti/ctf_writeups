@@ -1,0 +1,30 @@
+the goal here is to change the value of a variable from 1 to 0 and crash all the intergalatic federation
+the code is something like this
+  printf("enter password: ");
+  s = (char *)malloc(0x10);
+  x = (unsigned int *)malloc(8);
+  *x = 1;
+  fgets(s,0xa0,stdin);
+  printf("uid: %d\n",(unsigned int)*x);
+  if (*puVar1 == 0)
+    puts ("you are logged in as admin");
+  else
+    puts ("you are logged in as user");
+
+first problem here is that the string 's' allocate 0x10 bytes of memory on malloc and fgets reads 0xa0
+malloc doesnt necessary allocs in sequence, but I assume that in this case it does
+based on this assumption, overflowing the 's' buffer will write into 'x' variable address
+doing some tests, I was able to change the 'x' variable value with a buffer > 30
+using gdb dissassembler on login ():
+  mov    rax,QWORD PTR [rbp-0x10]
+  mov    eax,DWORD PTR [rax]
+  test   eax,eax
+  jne    0x11f0 <login+139>
+
+test is using EAX to compare, so it is a 32bit integer. This is wierd as the malloc(8) allocs 8 bytes(64bits)
+
+based on this documentation (http://www.cplusplus.com/reference/cstdio/fgets/):
+  Reads characters from stream and stores them as a C string into str until (num-1) characters have been read or either a newline or the end-of-file is reached, whichever happens first.
+  A terminating null character ('\0') is automatically appended on the buffer using fgets
+writing NULL values is allowed by fgets, this is allowing the attacker to zero everything
+as the malloc(0x10) allocs 16 bytes, a exploit like this (b'a'*16 + b'\x00'*(160-16)) should work fine

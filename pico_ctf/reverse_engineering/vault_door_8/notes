@@ -1,0 +1,4 @@
+using a beaultifier to make the code better looking
+for each byte of the flag its bytes are changed
+
+doing the same thing as the scramble do, but using the reversing order to switch bits

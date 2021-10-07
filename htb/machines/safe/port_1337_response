@@ -1,0 +1,45 @@
+SF-Port1337-TCP:V=7.80%I=7%D=9/18%Time=5F649C61%P=x86_64-pc-linux-gnu
+
+(NULL,3E," 07:45:53 up 6 min,  0 users,  load average: 0.00, 0.00, 0.00
+")
+
+(GenericLines,63," 07:45:53 up 6 min,  0 users,  load average: 0.00, 0.00, 0.00
+What do you want me to echo back? 
+")
+
+(GetRequest,71," 07:46:00 up 6 min,  0 users,  load average: 0.00, 0.00, 0.00
+What do you want me to echo back? GET / HTTP/1\.0
+")
+
+(HTTPOptions,75," 07:46:00 up 6 min,  0 users,  load average: 0.00, 0.00, 0.00
+What do you want me to echo back? OPTIONS / HTTP/1\.0
+")
+
+(RTSPRequest,75," 07:46:01 up 6 min,  0 users,  load average: 0.00, 0.00, 0.00
+What do you want me to echo back? OPTIONS / RTSP/1\.0
+")
+
+(RPCCheck,3E," 07:46:01 up 6 min,  0 users,  load average: 0.00, 0.00, 0.00
+")
+
+(DNSVersionBindReqTCP,3E," 07:46:06 up 7 min,  0 users,  load average: 0.00, 0.00, 0.00
+")
+
+(DNSStatusRequestTCP,3E," 07:46:12 up 7 min,  0 users,  load average: 0.00, 0.00, 0.00
+")
+
+(Help,67," 07:46:17 up 7 min,  0 users,  load average: 0.00, 0.00, 0.00
+What do you want me to echo back? HELP
+")
+
+(SSLSessionReq,64," 07:46:17 up 7 min,  0 users,  load average: 0.00, 0.00, 0.00
+What do you want me to echo back?
+")
+
+(TerminalServerCookie,63," 07:46:18 up 7 min,  0 users,  load average: 0.00, 0.00, 0.00
+What do you want me to echo back?
+")
+
+(TLSSessionReq,64," 07:46:18 up 7 min,  0 users,  load average: 0.00, 0.00, 0.00
+What do you want me to echo back?
+");

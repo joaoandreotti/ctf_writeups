@@ -1,0 +1,3 @@
+this level is a wierd one. One approach to solve this would be enum the directories of this website, using goburster would be something like this: gobuster dir -u https://www.hackthissite.org/missions/basic/11/ -u /usr/share/wordlists/dirb/common.txt -x php --timeout 120s. Using the default 10 threads to not overload the server and a big timeout, searching of php extensions as the website is php based. two important directories will be found, the index.php and the e/.
+The pass form is typed on the index.php, but it isnt discovered
+following the e/ dir found e/l/t/o/n with nothing inside. anothe dir enum found something odd, a 200 code returned from .htaccess. Going to e/l/t/o/n/DaAnswer found a file with the answer

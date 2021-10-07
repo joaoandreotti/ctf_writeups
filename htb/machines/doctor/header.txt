@@ -1,0 +1,12 @@
+GET /user/james?page=1 HTTP/1.1
+Host: doctors.htb
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://doctors.htb/user/james?page=13
+DNT: 1
+Connection: close
+Cookie: session=.eJwljjFuAzEMBP-i2oVEUpTozxxIkUQCAwlwZ1eG_x4BKWen2HmXI8-4vsr9eb7iVo5vL_fSnafKGjB4rpYDNJMWIAjOZtW28sqqosNR6-C6jAkxFGflrm6dGpmaLSJX4eC0GibTHZhqSGRznITuskQjOkxMl6gwU6TskNcV538NbFzXmcfz9xE_e2gtgkF6uFDo3GeSZM26jt7CnAJpoY7y-QNa8UCw.X3SD-g.C_cjdukzMMJBajL7DJJ4Zv7HV2U
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age=0

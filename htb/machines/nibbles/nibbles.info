@@ -1,0 +1,58 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 c4:f8:ad:e8:f8:04:77:de:cf:15:0d:63:0a:18:7e:49 (RSA)
+|   256 22:8f:b1:97:bf:0f:17:08:fc:7e:2c:8f:e9:77:3a:48 (ECDSA)
+|_  256 e6:ac:27:a3:b5:a9:f1:12:3c:34:a5:5d:5b:eb:3d:e9 (ED25519)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html).
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 80/tcp on 10.10.10.75                                     
+Discovered open port 22/tcp on 10.10.10.75
+
+
+---GOBUSTER---
+/nibbleblog (dir-list-lowecase):
+  /content (Status: 200)
+  /feed.php (Status: 200)
+  /sitemap.php (Status: 200)
+  /index.php (Status: 200)
+  /themes (Status: 200)
+  /admin (Status: 200)
+  /admin.php (Status: 200)
+  /plugins (Status: 200)
+  /install.php (Status: 200)
+  /update.php (Status: 200)
+  /languages (Status: 200)
+
+---ATTEMPTS---
+found /nibbleblog/ in source code from /
+"Nibbleblog 4.0.3 "Coffee" ©2009 - 2014 | Developed by Diego Najar"
+found file http://10.10.10.75/nibbleblog/content/private/config.xml in /nibbleblog/update.php:
+  <notification_email_to type="string">admin@nibbles.com</notification_email_to>
+  <notification_email_from type="string">noreply@10.10.10.134</notification_email_from>
+
+searching more files in /nibbleblog/content/private/ found the users.xml:
+  <user username="admin">
+trying to bruteforce login (got blacklisted)
+
+trying some combinations by hand like admin/admin
+found admin/nibbles
+
+using the msfexploit
+done!
+*cat /home/nibbler/user.txt
+*cat /shadow.php
+  <?php $_USER[0]["uid"] = "0"; $_USER[0]["username"] = "admin"; $_USER[0]["password"] = "ea8e3c9799c10e2982c0b54299fd866f32b95f5a"; $_USER[0]["salt"] = "8^8!@tv&zb3"; $_USER[0]["email"] = "admin@nibbles.com"; ?>
+
+User nibbler may run the following commands on Nibbles:
+    (root) NOPASSWD: /home/nibbler/personal/stuff/monitor.sh
+
+changing the monitor.sh to execute /bin/bash
+done!
+*cat /root/root.txt

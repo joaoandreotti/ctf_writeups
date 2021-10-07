@@ -1,0 +1,7 @@
+the form calles a function validate () that is on s3cr37.js
+if(u == "admin" && p == String.fromCharCode(80,64,36,36,87,48,114,68)){
+      document.location = p + ".html";
+}
+ascii decoding: P@$$W0rD
+
+login with creds

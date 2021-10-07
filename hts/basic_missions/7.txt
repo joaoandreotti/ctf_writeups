@@ -1,0 +1,1 @@
+the website is executing the command line cal command and the arguments are written by the user in the textbox. Testing if the parameters are sanitized is somthing as simple as "; ls". This works because on the unix shell the semicolon is used to separated two or more commands e.g. "ls -la; echo JAMES". And in this case doing ";ls" will show the hidden unencrypted passfile

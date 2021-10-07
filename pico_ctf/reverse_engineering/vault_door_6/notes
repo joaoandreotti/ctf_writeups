@@ -1,0 +1,7 @@
+found the book with only 662 pages...
+
+the if check if != 0 then false, so:
+  (x^0x55) - y = 0
+
+(x^0x55) = y | (y^0x55) = x
+in this case y is myBytes [i] and x is the ans

@@ -1,0 +1,24 @@
+asm3 (0xd73346ed,0xd48672ae,0xd3c8b139)
+
+ebp+0x8 == 0xd73346ed
+ebp+0xc == 0xd48672ae
+ebp+0x10 == 0xd3c8b139
+
+stack:
+  0x8  : ed
+  0x9  : 46
+  0xa  : 33
+  0xb  : d7
+  0xc  : ae
+  0xd  : 72
+  0xe  : 86
+  0xf  : d4
+  0x10 : 39
+  0x11 : b1
+  0x12 : c8
+  0x13 : d3
+
+....
+fuck, going the easy way
+creating a c program to print that prints
+gcc -m32 -c main.c -o main.o && gcc -m32 -c test.S -o test.o && gcc -m32 test.o main.o -o james && ./james

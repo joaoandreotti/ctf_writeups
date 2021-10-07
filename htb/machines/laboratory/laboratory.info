@@ -1,0 +1,66 @@
+---PORT ENUM---
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+80/tcp  open  http     Apache httpd 2.4.41
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Did not follow redirect to https://laboratory.htb/
+443/tcp open  ssl/http Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: The Laboratory
+| ssl-cert: Subject: commonName=laboratory.htb
+| Subject Alternative Name: DNS:git.laboratory.htb
+| Not valid before: 2020-07-05T10:39:28
+|_Not valid after:  2024-03-03T10:39:28
+| tls-alpn: 
+|_  http/1.1
+Service Info: Host: laboratory.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---DIR ENUM---
+
+---GENERAL INFO---
+gitlab version 12.8.1
+In git.laboratory.htb is possible to create an account, but, it is needed a special email account. Trying @laboratory.htb and done!
+found a git projet https://git.laboratory.htb/dexter/securewebsite
+cannot edit the projet
+this gitlab version is vulnerable to ArbitraryFileRead and to RCE
+  https://hackerone.com/reports/827052
+found a metasploit exploit on github, using and kudos! got initial shell
+  this exploit works on a malicious cookie that is sent to gitlab on login page
+
+---LAT MOV---
+/var/opt/gitlab/gitlab-exporter/gitlab-exporter.xml:
+  opts:
+    connection_string: dbname=gitlabhq_production user=gitlab host=/var/opt/gitlab/postgresql port=5432 password=
+
+if enough privileges change current gitlab account to a "root" one
+found some private rsa keys that are associated with "secret_key_base" (used in cookie authentication)
+  can it be used to priv esc?
+
+found that with 'gitlab-rails console' it is possible to change users information
+  https://docs.gitlab.com/12.10/ee/security/reset_root_password.html
+change the 'dexter' password to a known one and login to gitlab
+found a secret repository with a docker script and a something that looks like a /home/ dir with .ssh in it
+downloading the rsa key and 'ssh -i id_rsa dexter@10.10.10.216'
+kudos!
+cat /home/dexter/user.txt
+
+cronjob found:
+  #*/15 * * * *	root	docker exec gitlab gitlab-ctl restart
+
+SUID file with execute permission:
+  -rwsr-xr-x 1 root dexter 16720 Aug 28 14:52 /usr/local/bin/docker-security
+
+using ghidra to RE this file:
+  void main(void)
+  {
+    setuid(0);
+    setgid(0);
+    system("chmod 700 /usr/bin/docker");
+    system("chmod 660 /var/run/docker.sock");
+    return;
+  }
+
+changing the PATH variable to execute a custom chmod that runs a "/bin/bash"
+kudos!
+
+cat /root/root.txt

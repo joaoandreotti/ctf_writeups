@@ -1,0 +1,189 @@
+<><><> NMAP <><><>
+PORT     STATE SERVICE         REASON
+22/tcp   open  ssh             syn-ack ttl 63
+80/tcp   open  http            syn-ack ttl 63
+| http-csrf: 
+| Spidering limited to: maxdepth=3; maxpagecount=20; withinhost=spectra.htb
+|   Found the following possible CSRF vulnerabilities: 
+|     
+|     Path: http://spectra.htb:80/main/
+|     Form id: search-form-1
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/
+|     Form id: search-form-2
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?cat=1
+|     Form id: search-form-1
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?cat=1
+|     Form id: search-form-2
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?author=1
+|     Form id: search-form-1
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?author=1
+|     Form id: search-form-2
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?page_id=2
+|     Form id: search-form-1
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?page_id=2
+|     Form id: search-form-2
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/wp-login.php
+|     Form id: loginform
+|     Form action: http://spectra.htb/main/wp-login.php
+|     
+|     Path: http://spectra.htb:80/main/
+|     Form id: search-form-1
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/
+|     Form id: search-form-2
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?p=1
+|     Form id: search-form-1
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?p=1
+|     Form id: commentform
+|     Form action: http://spectra.htb/main/wp-comments-post.php
+|     
+|     Path: http://spectra.htb:80/main/?p=1
+|     Form id: search-form-2
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?m=202006
+|     Form id: search-form-1
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?m=202006
+|     Form id: search-form-2
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?page_id=2
+|     Form id: search-form-1
+|     Form action: http://spectra.htb/main/
+|     
+|     Path: http://spectra.htb:80/main/?page_id=2
+|     Form id: search-form-2
+|_    Form action: http://spectra.htb/main/
+|_http-dombased-xss: Couldn't find any DOM based XSS.
+| http-enum: 
+|_  /testing/: Potentially interesting folder w/ directory listing
+|_http-jsonp-detection: Couldn't find any JSONP endpoints.
+|_http-litespeed-sourcecode-download: Request with null byte did not work. This web server might not be vulnerable
+|_http-stored-xss: Couldn't find any stored XSS vulnerabilities.
+| http-vuln-cve2011-3192: 
+|   VULNERABLE:
+|   Apache byterange filter DoS
+|     State: VULNERABLE
+|     IDs:  CVE:CVE-2011-3192  BID:49303
+|       The Apache web server is vulnerable to a denial of service attack when numerous
+|       overlapping byte ranges are requested.
+|     Disclosure date: 2011-08-19
+|     References:
+|       https://www.securityfocus.com/bid/49303
+|       https://www.tenable.com/plugins/nessus/55976
+|       https://seclists.org/fulldisclosure/2011/Aug/175
+|_      https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-3192
+|_http-wordpress-users: [Error] Wordpress installation was not found. We couldn't find wp-login.php
+3306/tcp open  mysql           syn-ack ttl 63
+|_mysql-vuln-cve2012-2122: ERROR: Script execution failed (use -d to debug)
+|_ssl-dh-params: ERROR: Script execution failed (use -d to debug)
+|_ssl-heartbleed: ERROR: Script execution failed (use -d to debug)
+|_ssl-poodle: ERROR: Script execution failed (use -d to debug)
+|_sslv2-drown: ERROR: Script execution failed (use -d to debug)
+|_tls-ticketbleed: ERROR: Script execution failed (use -d to debug)
+8081/tcp open  blackice-icecap syn-ack ttl 63
+
+
+<><><> GOBUSTER <><><>
+/main:
+		/harm.txt             (Status: 403) [Size: 153]
+		/have                 (Status: 403) [Size: 153]
+		/handlers.js          (Status: 403) [Size: 153]
+		/hansolo.js           (Status: 403) [Size: 153]
+		/hanson.txt           (Status: 403) [Size: 153]
+		/hans.txt             (Status: 403) [Size: 153]
+		/hawk                 (Status: 403) [Size: 153]
+		/havejob              (Status: 403) [Size: 153]
+		/handouts.js          (Status: 403) [Size: 153]
+		/happening            (Status: 403) [Size: 153]
+		/handy.js             (Status: 403) [Size: 153]
+		/happy                (Status: 403) [Size: 153]
+		/hazel                (Status: 403) [Size: 153]
+		/hawaii               (Status: 403) [Size: 153]
+		/handwerk.txt         (Status: 403) [Size: 153]
+		/hbcms                (Status: 403) [Size: 153]
+		/hb.js                (Status: 403) [Size: 153]
+		/happy1.txt           (Status: 403) [Size: 153]
+		/hbx                  (Status: 403) [Size: 153]
+		/hangman              (Status: 403) [Size: 153]
+		/harrison.js          (Status: 403) [Size: 153]
+		/license.txt          (Status: 200) [Size: 19915]
+		/wp-content           (Status: 200) [Size: 0]
+		/wp-includes          (Status: 403) [Size: 153]
+		/wp-trackback.php     (Status: 200) [Size: 135]
+		/wp-login.php         (Status: 200) [Size: 4902]
+		/xmlrpc.php           (Status: 405) [Size: 42]
+/testing:
+		/index.php            (Status: 500) [Size: 2646]
+		/license.txt          (Status: 200) [Size: 19915]
+		/wp-admin             (Status: 200) [Size: 11460]
+		/wp-config.php        (Status: 500) [Size: 2646]
+		/wp-content           (Status: 200) [Size: 627]
+		/wp-trackback.php     (Status: 500) [Size: 2646]
+		/wp-login.php         (Status: 500) [Size: 2646]
+		/wp-includes          (Status: 200) [Size: 25891]
+		/xmlrpc.php           (Status: 200) [Size: 0]
+
+<><><> ATTEMPTS <><><>
+ftp like server in spectra.htb/testing/
+using bruteforce in lost password page to found user
+found user "administrator"
+found user "administrator" in page source in /?author=1
+trying to bruteforce user/pass now
+	unsuccessful
+found database password in view-source:http://spectra.htb/testing/wp-config.php.save
+trying to administrator:
+	kudos!
+	administrator:devteam01
+
+db:
+	name: dev
+	user: devtest
+	pass: devteam01
+db:
+	name: dev
+	user: dev
+	pass: development01
+
+changing 404 template and injecting with a php rshell
+done
+
+<><><> PRIVESC <><><>
+logged as nginx
+found /srv which contains a js code to run the server on 8081 that can be modified by `developers` group
+	and it is created by root, i guess this can be modified to a rshell and get root when accessed by katie
+found a dictionary.txt file in /mnt/stateful_partition/dev_image/share
+bruteforcing katie in ssh
+	unsuccessful
+after a while of enumeration, found another passwd in /etc/autologin/passwd with a password:
+	SummerHereWeCome!!
+trying to login into katie
+kudos!
+
+found /etc/init/test*.conf through linpeas and it has this line:
+	exec /usr/local/share/nodebrew/node/v8.9.4/bin/node /srv/nodetest.js
+could be used to execute a rshell in node and using initctl to run it
+it is it!! 

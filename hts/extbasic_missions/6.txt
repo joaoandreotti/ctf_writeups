@@ -1,0 +1,2 @@
+change the variable passed to true
+http://moo.com/moo.php?user=james&pass=james&passed=TRUE

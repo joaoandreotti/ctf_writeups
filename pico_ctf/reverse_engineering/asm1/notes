@@ -1,0 +1,11 @@
+first arg is ebp+0x8
+
+<+10> jg (dont jump : 0x2e0 < 0x3fb)
+<+19> jne (jump : 0x2e0 != 0x280)
+
+<+29> eax = 0x2e0;
+<+32> eax -= 0xa;
+eax (0x2d6)
+jmp to return
+
+boom

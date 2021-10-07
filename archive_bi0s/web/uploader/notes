@@ -1,0 +1,24 @@
+source.txt:
+  <?php
+    if (isset ($_FILES) && !empty ($_FILES)): 
+      if ($_FILES['fileToUpload']['size'] <= 50000) {
+        echo '<p class="lead">Dump of <strong>' . $uploadedFile . htmlentities($_FILES['fileToUpload']['name']) . '</strong>:</p>';
+        echo '<pre>';
+        echo include_once($_FILES['fileToUpload']['tmp_name']);
+        echo '</pre>';
+      }
+      else
+      {
+        echo '<p class="text-danger">The file is too big</p>';
+      }
+    endif
+  ?>
+
+printing the file name
+what if filename is <script>alert()</script>, doesnt work
+
+code is allowed to be executed (echo include_once($_FILES['fileToUpload']['tmp_name']);)
+javascript or php code can be easily executed
+keeping things simple
+  shell_exec ('ls');
+  shell_exec ('flag name')

@@ -1,0 +1,22 @@
+32bit elf
+checksec:
+  RELRO:    Partial RELRO
+  Stack:    No canary found
+  NX:       NX enabled
+  PIE:      No PIE (0x8048000)
+
+no pie, and no canary
+dynamic linked
+buff overflow is on, so easy ret2libc
+
+first, leaking __libc_start_main and gets
+found libc:
+  libc6-i386_2.28-10_amd64
+
+downloading libc and doing the exploit
+steps:
+  leaking __libc_start_main addr again and return to <main+0>
+  to construct the payload: get the libc 2.28 __libc_start_main addr, and subtract by the offset of the current __libc_start_main addr, this way bypassing the aslr
+  send the shell payload :)
+
+done

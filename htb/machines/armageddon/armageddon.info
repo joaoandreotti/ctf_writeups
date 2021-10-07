@@ -1,0 +1,75 @@
+<><><> NMAP <><><>
+PORT   STATE SERVICE REASON
+22/tcp open  ssh     syn-ack
+| ssh-hostkey: 
+|   2048 82:c6:bb:c7:02:6a:93:bb:7c:cb:dd:9c:30:93:79:34 (RSA)
+| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDC2xdFP3J4cpINVArODYtbhv+uQNECQHDkzTeWL+4aLgKcJuIoA8dQdVuP2UaLUJ0XtbyuabPEBzJl3IHg3vztFZ8UEcS94KuWP09ghv6fhc7JbFYONVJTYLiEPD8nrS/V2EPEQJ2ubNXcZAR76X9SZqt11JTyQH/s6tPH+m3m/84NUU8PNb/dyhrFpCUmZzzJQ1zCDStLXJnCAOE7EfW2wNm1CBPCXn1wNvO3SKwokCm4GoMKHSM9rNb9FjGLIY0nq+8mt7RTJZ+WLdHsje3AkBk1yooGFF+0TdOj42YK2OtAKDQBWnBm1nqLQsmm/Va9T2bPYLLK5aUd4/578u7h
+|   256 3a:ca:95:30:f3:12:d7:ca:45:05:bc:c7:f1:16:bb:fc (ECDSA)
+| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBE4kP4gQ5Th3eu3vz/kPWwlUCm+6BSM6M3Y43IuYVo3ppmJG+wKiabo/gVYLOwzG7js497Vr7eGIgsjUtbIGUrY=
+|   256 7a:d4:b3:68:79:cf:62:8a:7d:5a:61:e7:06:0f:5f:33 (ED25519)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG9ZlC3EA13xZbzvvdjZRWhnu9clFOUe7irG8kT0oR4A
+80/tcp open  http    syn-ack
+|_http-favicon: Unknown favicon MD5: 1487A9908F898326EBABFFFD2407920D
+|_http-generator: Drupal 7 (http://drupal.org)
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+| http-robots.txt: 36 disallowed entries 
+| /includes/ /misc/ /modules/ /profiles/ /scripts/ 
+| /themes/ /CHANGELOG.txt /cron.php /INSTALL.mysql.txt 
+| /INSTALL.pgsql.txt /INSTALL.sqlite.txt /install.php /INSTALL.txt 
+| /LICENSE.txt /MAINTAINERS.txt /update.php /UPGRADE.txt /xmlrpc.php 
+| /admin/ /comment/reply/ /filter/tips/ /node/add/ /search/ 
+| /user/register/ /user/password/ /user/login/ /user/logout/ /?q=admin/ 
+| /?q=comment/reply/ /?q=filter/tips/ /?q=node/add/ /?q=search/ 
+|_/?q=user/password/ /?q=user/register/ /?q=user/login/ /?q=user/logout/
+|_http-title: Welcome to  Armageddon |  Armageddon
+
+
+<><><> GOBUSTER <><><>
+/.htpasswd            (Status: 403) [Size: 211]
+/.htaccess            (Status: 403) [Size: 211]
+/.htpasswd.txt        (Status: 403) [Size: 215]
+/.htaccess.js         (Status: 403) [Size: 214]
+/.htpasswd.php        (Status: 403) [Size: 215]
+/.htaccess.txt        (Status: 403) [Size: 215]
+/.htpasswd.js         (Status: 403) [Size: 214]
+/.htaccess.php        (Status: 403) [Size: 215]
+/LICENSE.txt          (Status: 200) [Size: 18092]
+/README.txt           (Status: 200) [Size: 5382] 
+/authorize.php        (Status: 403) [Size: 2824] 
+/cgi-bin/             (Status: 403) [Size: 210]  
+/cron.php             (Status: 403) [Size: 7388] 
+/includes             (Status: 200) [Size: 10673]
+/index.php            (Status: 200) [Size: 7440] 
+/install.php          (Status: 200) [Size: 3172] 
+/misc                 (Status: 200) [Size: 16187]
+/modules              (Status: 200) [Size: 9084] 
+/profiles             (Status: 200) [Size: 1313] 
+/robots.txt           (Status: 200) [Size: 2189] 
+/robots.txt           (Status: 200) [Size: 2189] 
+/scripts              (Status: 200) [Size: 3075] 
+/shell.php            (Status: 200) [Size: 0]    
+/sites                (Status: 200) [Size: 1309] 
+/themes               (Status: 200) [Size: 1725] 
+/update.php           (Status: 403) [Size: 4057] 
+/xmlrpc.php           (Status: 200) [Size: 42]   
+
+
+<><><> ATTEMPTS <><><>
+find that it runs drupal 7.56 and it is vulnerable to RCE, gotta a rshell
+uploading and running linpeas
+found /var/www/html/sites/default/settings.php:
+      'database' => 'drupal',
+      'username' => 'drupaluser',
+      'password' => 'CQHEy@9M*m23gBVj'
+found 'users' table
+found hash from brucetherealadmin which is a linux user
+  $S$DgL2gjv6ZtxBo6CdqZEyJuBphBmrCqIV6W97.oOsUf1xAhaadURt
+using john to decrypt
+	booboo
+this isn`t the same user password though
+fuck! problem with su, tried with ssh and worked...
+sudo -l
+	nopasswd snap install
+lookup on gtfo and boom
+kudos!

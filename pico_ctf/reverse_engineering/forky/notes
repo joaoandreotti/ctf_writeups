@@ -1,0 +1,10 @@
+mmap ();
+  If addr is NULL, then the kernel chooses the (page-aligned) address at which to create the mapping
+  The length argument specifies the length of the mapping
+  The prot argument describes the desired memory protection of the mapping
+  The flags argument determines whether updates to the mapping are visible to other processes mapping the same region, and whether updates are carried through to the underlying file.
+  The contents of a file mapping (as opposed to an anonymous mapping; see MAP_ANONYMOUS below), are initialized using length bytes starting at offset offset in the file (or other object) referred to by the file descriptor fd.
+
+mmap has nothing to do with it
+
+a pointer to a integer (var1) is written in its value 1000000000, then 4 fork () calls, which result in 16 calls to (*var1 = *var1 + 0x499602d2). This causes an overflow, so to solve this is just call a print in c to this expression

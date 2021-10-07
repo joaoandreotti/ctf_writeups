@@ -1,0 +1,1 @@
+the email is sended as a POST request, just make a POST request with your hts email

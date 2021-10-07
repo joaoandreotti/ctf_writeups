@@ -1,0 +1,16 @@
+each char of key must be a hex one (0-9, a-f)
+
+function jumble (char c1):
+  if c1 == number:
+    c1 += 9
+  c1 *= 2
+  return c1 + 1
+
+a way to solve is get the string that it is comparing (jbgkfmgkknbiblpmibgkcneiedgokibmekffokamknbkhgnlhnajeefpekiefmjgeogjbflijnekebeokpgngjnfbimlkdjdjhan) and do the reverse operations
+easy to brute too, decompile the program, get the code and print the generated flag, if true then BOOOOM
+complexity is O(16 * 100), nothing
+
+a decompiled version of the program is created
+a little modification is to print the current encoded value to check if it is right
+python script to solve
+then, XOR with the flag ("You got the key, congrats! Now xor it with the flag!")

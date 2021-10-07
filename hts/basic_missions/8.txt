@@ -1,0 +1,1 @@
+The same principle to code execution is used on this level. When the user type a name into the form, it creates a file with blablabla.shtml. With a lil bit of search it is possible to find how to execute commands inside shtml (https://owasp.org/www-community/attacks/Server-Side_Includes_(SSI)_Injection)To find the file just execute the "ls ../" command

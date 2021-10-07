@@ -1,0 +1,10 @@
+round 1 (filter: or)
+  admin';/*
+round 2 (filter: or and like = --)
+  admin';/*
+round 3 (filter: or and = like > < --)
+  admin';/*
+round 4 (filter: or and = like > < -- admin)  (|| is concat in sqlite (hint))
+  ad'||'min';/*
+round 5 (filter: or and = like > < -- admin union)
+  ad'||'min';/*

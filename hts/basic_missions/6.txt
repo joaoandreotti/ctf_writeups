@@ -1,0 +1,10 @@
+the encryption is made by a basic pattern, this can be easily found if the typed message to encrypt is aaaa or 0123.
+The encryption code will be something like this:
+  msg = "james"
+  i = 0
+  ans = ""
+  for x in msg:
+    ans += chr (ord (x) + i)
+    i += 1
+  print (ans)
+to decrypt just subtract (ord (x) - i) instead of adding

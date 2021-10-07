@@ -1,0 +1,113 @@
+<><><> NMAP <><><>
+PORT      STATE SERVICE     VERSION
+22/tcp    open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 b3:ad:83:41:49:e9:5d:16:8d:3b:0f:05:7b:e2:c0:ae (RSA)
+|   256 f8:27:7d:64:29:97:e6:f8:65:54:65:22:f7:c8:1d:8a (ECDSA)
+|_  256 5a:06:ed:eb:b6:56:7e:4c:01:dd:ea:bc:ba:fa:33:79 (ED25519)
+80/tcp    open  http        Apache httpd 2.4.18 ((Ubuntu))
+| http-robots.txt: 1 disallowed entry 
+|_/admin.html
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html).
+111/tcp   open  rpcbind     2-4 (RPC #100000)
+| rpcinfo: 
+|   program version    port/proto  service
+|   100000  2,3,4        111/tcp   rpcbind
+|   100000  2,3,4        111/udp   rpcbind
+|   100000  3,4          111/tcp6  rpcbind
+|   100000  3,4          111/udp6  rpcbind
+|   100003  2,3,4       2049/tcp   nfs
+|   100003  2,3,4       2049/tcp6  nfs
+|   100003  2,3,4       2049/udp   nfs
+|   100003  2,3,4       2049/udp6  nfs
+|   100005  1,2,3      34675/tcp6  mountd
+|   100005  1,2,3      37781/udp6  mountd
+|   100005  1,2,3      49952/udp   mountd
+|   100005  1,2,3      50105/tcp   mountd
+|   100021  1,3,4      37685/tcp   nlockmgr
+|   100021  1,3,4      45613/tcp6  nlockmgr
+|   100021  1,3,4      46956/udp6  nlockmgr
+|   100021  1,3,4      51903/udp   nlockmgr
+|   100227  2,3         2049/tcp   nfs_acl
+|   100227  2,3         2049/tcp6  nfs_acl
+|   100227  2,3         2049/udp   nfs_acl
+|_  100227  2,3         2049/udp6  nfs_acl
+139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp   open  netbios-ssn Samba smbd 4.3.11-Ubuntu (workgroup: WORKGROUP)
+2049/tcp  open  nfs_acl     2-3 (RPC #100227)
+37685/tcp open  nlockmgr    1-4 (RPC #100021)
+50105/tcp open  mountd      1-3 (RPC #100005)
+52925/tcp open  mountd      1-3 (RPC #100005)
+54741/tcp open  mountd      1-3 (RPC #100005)
+Service Info: Host: KENOBI; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_clock-skew: mean: 1h40m01s, deviation: 2h53m12s, median: 0s
+|_nbstat: NetBIOS name: KENOBI, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.3.11-Ubuntu)
+|   Computer name: kenobi
+|   NetBIOS computer name: KENOBI\x00
+|   Domain name: \x00
+|   FQDN: kenobi
+|_  System time: 2021-05-24T06:20:41-05:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-05-24T11:20:42
+|_  start_date: N/A
+
+<><><> ATTEMPTS <><><>
+using nfs-showmount from nmap to see if it is possible to access any volume
+PORT    STATE SERVICE
+111/tcp open  rpcbind
+| nfs-showmount: 
+|_  /var *
+using linux nfs-common lib to mount volumes through network
+found a file from samba that is a logo which has a ProFTPd server running but the port wasn`t showing in nmap, why?
+found that the user kenobi create a rsa key pair on /home/kenobi/.ssh/
+searching a known exploit for every port open
+found that it is possible to copy any readable file to any writable folder that the user has access
+copying to /var/tmp and accessing through the mounted volume using nfs
+using john to crack
+oh, unencrypted private key? lol
+user kudos!
+uid=1000(kenobi) gid=1000(kenobi) groups=1000(kenobi),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),110(lxd),113(lpadmin),114(sambashare)
+lxd isnt running :(
+i dont have the user password, so :(
+found a weird menu file with suid on /usr/bin/menu
+reversing the c code, found that it execute binaries without full path and it can be exploitable using kenobi user fake path to ~/bin
+(
+  puts("\n***************************************");
+  puts("1. status check");
+  puts("2. kernel version");
+  puts("3. ifconfig");
+  printf("** Enter your choice :");
+  __isoc99_scanf(&DAT_004008b6,&local_14);
+  setuid(0);
+  if (local_14 == 2) {
+    system("uname -r");
+  }
+  else {
+    if (local_14 == 3) {
+      system("ifconfig");
+    }
+    else {
+      if (local_14 == 1) {
+        system("curl -I localhost");
+      }
+      else {
+        printf("\n Invalid choice");
+      }
+    }
+  }
+)
+kudos!
+
